@@ -18,7 +18,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\marchgl.cpp">
+    <ClCompile Include="src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="include\marchgl.cpp">
@@ -30,13 +30,19 @@
     <None Include="res\shaders\shader_fs.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\marchgl.h">
+    <ClInclude Include="include\filesys.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glm\glm.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\filesys.hpp">
+    <ClInclude Include="include\glad\glad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\marchgl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

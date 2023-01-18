@@ -1,19 +1,18 @@
 #ifndef MARCHGL_H
 #define MARCHGL_H
 
+#include <windows.h>
+#include <camera.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <camera.h>
 #include <filesys.hpp>
 //#include <shader_m.h>
 
 #include <filesystem>
 #include <iostream>
 
-#ifdef _WIN32
-string slash = "\\";
-#else
-string slash = "/";
+#ifdef _WIN32 string slash = "\\";
+#else string slash = "/";
 #endif
 
 using namespace std;
