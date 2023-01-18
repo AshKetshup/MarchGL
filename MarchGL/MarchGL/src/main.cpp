@@ -80,10 +80,11 @@ int main(int argc, const char* argv[]) {
 	}
 
 	MarchGL marchgl();
+	/*
 	if (!marchgl.launchSuccessful())
 		return -1;
 
 	marchgl.main();
-
+	*/
 	return 0;
 }
