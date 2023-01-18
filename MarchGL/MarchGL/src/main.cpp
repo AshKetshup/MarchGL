@@ -79,20 +79,12 @@ int main(int argc, const char* argv[]) {
 		return -1;
 	}
 
-<<<<<<< Updated upstream
-	MarchGL marchgl();
-=======
 	MarchGL marchgl;
-	
->>>>>>> Stashed changes
+
 	if (!marchgl.launchSuccessful())
 		return -1;
 
 	marchgl.main();
-<<<<<<< Updated upstream
-
-=======
 	
->>>>>>> Stashed changes
 	return 0;
 }
