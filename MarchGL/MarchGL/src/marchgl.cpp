@@ -197,7 +197,7 @@ void MarchGL::refresh(void) {
 	switch (processInput()) {
 		case action::CAMERA_RESET:
 			camera.Position = vec3(0.f, 1.f, 0.f);
-			cout << "Camera Reset." << endl;
+			std::cout << "Camera Reset." << endl;
 			break;
 		case action::CHANGE_COLOR:
 

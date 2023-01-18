@@ -8,6 +8,7 @@
 //#include <shader_m.h>
 
 #include <filesystem>
+#include <iostream>
 
 #ifdef _WIN32
 string slash = "\\";
@@ -96,6 +97,7 @@ class MarchGL {
 	string shaderDir;
 	string fontDir;
 	string resDir;
+	string slash;
 
 	string fontName;
 	string logoName;

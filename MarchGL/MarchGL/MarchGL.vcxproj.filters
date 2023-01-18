@@ -21,6 +21,9 @@
     <ClCompile Include="src\marchgl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\marchgl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\shader_vs.glsl" />

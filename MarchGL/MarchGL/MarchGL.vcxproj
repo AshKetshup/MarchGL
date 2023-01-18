@@ -116,7 +116,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+<<<<<<< Updated upstream
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+=======
+      <AdditionalIncludeDirectories>$(SolutionDir)MarchGL/include;$(SolutionDir)Dependencies\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+>>>>>>> Stashed changes
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,8 +150,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+<<<<<<< Updated upstream
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\marchgl.cpp" />
+=======
+    <ClCompile Include="include\marchgl.cpp" />
+    <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\main.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)MarchGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+>>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\shader_fs.glsl" />
