@@ -146,11 +146,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\marchgl.cpp" />
+    <ClCompile Include="src\implicit.cpp" />
+    <ClCompile Include="src\marchgl.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)MarchGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="src\squareMarch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="basicColorShader.fs" />
@@ -167,7 +169,10 @@
     <ClInclude Include="include\glm\glm.hpp" />
     <ClInclude Include="include\implicit.h" />
     <ClInclude Include="include\marchgl.h" />
+    <ClInclude Include="include\shader_m.h" />
     <ClInclude Include="include\squareMarch.h" />
+    <ClInclude Include="include\stb_image.h" />
+    <ClInclude Include="include\mutils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,6 @@
 #include "marchgl.h"
-#include "implicit.h"
-#include <squareMarch.h>
+
+#include "mutils.h"
 
 namespace callback {
 	MarchGL* instance = nullptr;
@@ -47,7 +47,7 @@ namespace callback {
 
 		getInstance()->setMouseData(pos, false);
 		getInstance()->getCamera().ProcessMouseMovement(offsets.x, offsets.y);
-	
+
 	}
 
 	void mouseScroll(GLFWwindow* window, double xoffset, double yoffset) {
@@ -61,8 +61,8 @@ const char* MarchGLException::what(void) const throw ( ) {
 
 bool MarchGL::initializeGLFW(unsigned int width, unsigned int height, const char* title) {
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	#ifdef __APPLE__
@@ -213,7 +213,7 @@ void MarchGL::refresh(void) {
 			break;
 	}
 
-	
+
 }
 
 //----------------------------------------------------main--------------------------------------------
@@ -226,14 +226,11 @@ void MarchGL::main(void) {
 	double timeDiff;
 
 	unsigned int counter = 0;
-	implicitSurface is = implicitSurface();
-	squareMarch sm = squareMarch(2, 2, 0.001);
+	ImplicitSurface is();
+	SquareMarch sm(2, 2, 0.001);
 
+	std::vector<vec3> vec = sm.getMeshVertices();
 
-	std::vector<vec3> vec = sm.meshVertices;
-
-
-	
 	while (!glfwWindowShouldClose(getWindow())) {
 		crntTime = glfwGetTime();
 		timeDiff = crntTime - prevTime;
