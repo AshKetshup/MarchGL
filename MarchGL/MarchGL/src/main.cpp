@@ -79,10 +79,17 @@ int main(int argc, const char* argv[]) {
 		return -1;
 	}
 
-	MarchGL marchgl;
 
-	if (!marchgl.launchSuccessful())
+	MarchGL marchgl({1920,1080,3, "GPU" });
+
+	if (!marchgl.launchSuccessful()) {
+		printf("Couldn't start MarchGL\n");
 		return -1;
+	}
+	string square = "0000";
+	int case_n = std::stoi(square, 0, 2);
+
+	printf("%d\n", case_n);
 
 	marchgl.main();
 	

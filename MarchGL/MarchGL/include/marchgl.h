@@ -8,6 +8,8 @@
 #include <filesys.hpp>
 //#include <shader_m.h>
 
+#include <GL/gl.h>
+
 #include <filesystem>
 #include <iostream>
 
@@ -87,7 +89,7 @@ class MarchGL {
 
 	private:
 	static constexpr vec3 SURF_DEFAULT_COLOR = vec3(50.f / 255.f, 140.f / 255.f, 235.f / 255.f);
-	static constexpr vec3 BG_DEFAULT_COLOR = vec3(46.f / 255.f, 68.f / 255.f, 64.f / 255.f);
+	static constexpr vec3 BG_DEFAULT_COLOR = vec3(0.53f, 0.81f, 0.98f);
 	bool success = false;
 
 	unsigned appFPS;

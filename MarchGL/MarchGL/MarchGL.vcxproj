@@ -153,15 +153,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="basicColorShader.fs" />
+    <None Include="basicColorShader.vs" />
     <None Include="res\shaders\shader_fs.glsl" />
     <None Include="res\shaders\shader_vs.glsl" />
+    <None Include="shaders\basicShader.fs" />
+    <None Include="shaders\basicShader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\filesys.hpp" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\glm\glm.hpp" />
+    <ClInclude Include="include\implicit.h" />
     <ClInclude Include="include\marchgl.h" />
+    <ClInclude Include="include\squareMarch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

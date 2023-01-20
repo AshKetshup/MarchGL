@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{e45e6dc0-5799-436e-904f-5fd5ee045b0e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -21,10 +24,25 @@
     <ClCompile Include="src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\marchgl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\shader_vs.glsl" />
     <None Include="res\shaders\shader_fs.glsl" />
+    <None Include="shaders\basicShader.fs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\basicShader.vs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="basicColorShader.vs">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="basicColorShader.fs">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\filesys.hpp">
@@ -40,6 +58,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\marchgl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\implicit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\squareMarch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

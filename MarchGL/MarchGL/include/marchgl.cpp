@@ -1,4 +1,6 @@
 #include "marchgl.h"
+#include "implicit.h"
+#include <squareMarch.h>
 
 namespace callback {
 	MarchGL* instance = nullptr;
@@ -45,6 +47,7 @@ namespace callback {
 
 		getInstance()->setMouseData(pos, false);
 		getInstance()->getCamera().ProcessMouseMovement(offsets.x, offsets.y);
+	
 	}
 
 	void mouseScroll(GLFWwindow* window, double xoffset, double yoffset) {
@@ -58,8 +61,8 @@ const char* MarchGLException::what(void) const throw ( ) {
 
 bool MarchGL::initializeGLFW(unsigned int width, unsigned int height, const char* title) {
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	#ifdef __APPLE__
@@ -77,7 +80,7 @@ bool MarchGL::initializeGLFW(unsigned int width, unsigned int height, const char
 	setCursorPositionCallback(callback::mouse);
 	setScrollCallback(callback::mouseScroll);
 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	return true;
 }
@@ -112,6 +115,7 @@ action MarchGL::processInput(void) {
 
 	return action::NO_ACTION;
 }
+
 
 Camera& MarchGL::getCamera(void) {
 	return camera;
@@ -209,9 +213,12 @@ void MarchGL::refresh(void) {
 			break;
 	}
 
-	glfwSwapBuffers(window);
-	glfwPollEvents();
+	
 }
+
+//----------------------------------------------------main--------------------------------------------
+
+
 
 void MarchGL::main(void) {
 	double prevTime = 0.0;
@@ -219,7 +226,14 @@ void MarchGL::main(void) {
 	double timeDiff;
 
 	unsigned int counter = 0;
+	implicitSurface is = implicitSurface();
+	squareMarch sm = squareMarch(2, 2, 0.001);
 
+
+	std::vector<vec3> vec = sm.meshVertices;
+
+
+	
 	while (!glfwWindowShouldClose(getWindow())) {
 		crntTime = glfwGetTime();
 		timeDiff = crntTime - prevTime;
@@ -233,6 +247,14 @@ void MarchGL::main(void) {
 		}
 
 		refresh();
+
+		//is.draw(camera);
+		sm.drawBorders(camera);
+		//sm.drawGrid(camera);
+		sm.drawMesh(camera);
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
 }
 
