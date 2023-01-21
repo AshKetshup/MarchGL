@@ -2,6 +2,11 @@
 #define MARCHGL_H
 
 #include <windows.h>
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include <camera.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -110,6 +115,8 @@ class MarchGL {
 	unsigned scr_width;
 	unsigned scr_height;
 
+	ImGuiIO io;
+
 	// Timing 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
@@ -125,7 +132,12 @@ class MarchGL {
 
 	bool initializeGLFW(unsigned int, unsigned int, const char*);
 	int initializeGLAD(void);
+	void initializeImGUI(void);
 	action processInput(void);
+
+	void newFrameUI(void);
+	void renderUI(void);
+	void terminateImGUI(void);
 };
 
 #endif

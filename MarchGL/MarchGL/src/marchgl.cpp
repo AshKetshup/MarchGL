@@ -89,33 +89,20 @@ int MarchGL::initializeGLAD(void) {
 	return gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 }
 
-action MarchGL::processInput(void) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
-	camera.MovementSpeed = ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS )
-		? 6.f
-		: 3.f;
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.ProcessKeyboard(DOWN, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		camera.ProcessKeyboard(UP, deltaTime);
-
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-		return action::CAMERA_RESET;
-
-	return action::NO_ACTION;
+void MarchGL::initializeImGUI(void) {
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	io = ImGui::GetIO(); (void) io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(getWindow(), true);
+	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
+void MarchGL::terminateImGUI(void) {
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
 
 Camera& MarchGL::getCamera(void) {
 	return camera;
@@ -185,79 +172,7 @@ void MarchGL::setFPS(unsigned fps) {
 	appFPS = fps;
 }
 
-void MarchGL::refresh(void) {
-	callback::bindInstance(this);
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
-
-	glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	currentFrame = glfwGetTime();
-	deltaTime = currentFrame - lastFrame;
-	lastFrame = currentFrame;
-
-	switch (processInput()) {
-		case action::CAMERA_RESET:
-			camera.Position = vec3(0.f, 1.f, 0.f);
-			cout << "Camera Reset." << endl;
-			break;
-		case action::CHANGE_COLOR:
-
-		case action::CHANGE_SHADER:
-		case action::SHADER_RELOAD:
-
-		case action::NO_ACTION:
-		default:
-			break;
-	}
-
-
-}
-
 //----------------------------------------------------main--------------------------------------------
-
-
-
-void MarchGL::main(void) {
-	double prevTime = 0.0;
-	double crntTime = 0.0;
-	double timeDiff;
-
-	unsigned int counter = 0;
-	ImplicitSurface is();
-	SquareMarch sm(2, 2, 0.001);
-
-	std::vector<vec3> vec = sm.getMeshVertices();
-
-	while (!glfwWindowShouldClose(getWindow())) {
-		crntTime = glfwGetTime();
-		timeDiff = crntTime - prevTime;
-		counter++;
-
-		if (timeDiff >= 1.0 / 30.0) {
-			setFPS(( 1.0 / timeDiff ) * counter);
-
-			prevTime = crntTime;
-			counter = 0;
-		}
-
-		refresh();
-
-		//is.draw(camera);
-		sm.drawBorders(camera);
-		//sm.drawGrid(camera);
-		sm.drawMesh(camera);
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-}
-
-void MarchGL::terminate(void) {
-	glfwTerminate();
-}
 
 MarchGL::MarchGL(void) { }
 
@@ -328,6 +243,117 @@ MarchGL::MarchGL(Arguments args) {
 	}
 
 	success = true;
+}
+
+void MarchGL::main(void) {
+	double prevTime = 0.0;
+	double crntTime = 0.0;
+	double timeDiff;
+
+	unsigned int counter = 0;
+
+	initializeImGUI();
+
+	while (!glfwWindowShouldClose(getWindow())) {
+		crntTime = glfwGetTime();
+		timeDiff = crntTime - prevTime;
+		counter++;
+
+		if (timeDiff >= 1.0 / 30.0) {
+			setFPS(( 1.0 / timeDiff ) * counter);
+
+			prevTime = crntTime;
+			counter = 0;
+		}
+
+		refresh();
+
+		//sm.drawBorders(camera);
+		//sm.drawMesh(camera);
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+}
+
+action MarchGL::processInput(void) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+
+	camera.MovementSpeed = ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS )
+		? 6.f
+		: 3.f;
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.ProcessKeyboard(FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.ProcessKeyboard(LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		camera.ProcessKeyboard(DOWN, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		camera.ProcessKeyboard(UP, deltaTime);
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		return action::CAMERA_RESET;
+
+	return action::NO_ACTION;
+}
+
+void MarchGL::newFrameUI(void) {
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+}
+
+void MarchGL::renderUI(void) {
+	ImGui::Begin("ImGUI Window!");
+	ImGui::Text("Hello there!");
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void MarchGL::refresh(void) {
+	callback::bindInstance(this);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+
+	glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	newFrameUI();
+
+	currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+
+	switch (processInput()) {
+		case action::CAMERA_RESET:
+			camera.Position = vec3(0.f, 1.f, 0.f);
+			cout << "Camera Reset." << endl;
+			break;
+		case action::CHANGE_COLOR:
+
+		case action::CHANGE_SHADER:
+		case action::SHADER_RELOAD:
+
+		case action::NO_ACTION:
+		default:
+			break;
+	}
+
+	renderUI();
+}
+
+void MarchGL::terminate(void) {
+	glfwTerminate();
+	terminateImGUI();
 }
 
 MarchGL::~MarchGL(void) {
