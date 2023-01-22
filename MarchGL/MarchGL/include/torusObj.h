@@ -10,18 +10,7 @@
 
 #define M_PI 3.1415927
 
-typedef struct {
-	//bottom of the cube (voxel
-	vec3 bbl; //bottom left
-	vec3 bbr;
-	vec3 btl;
-	vec3 btr;
 
-	vec3 tbl;
-	vec3 tbr;
-	vec3 ttl;
-	vec3 ttr;
-}VOXEL;
 
 
 class torusObj {

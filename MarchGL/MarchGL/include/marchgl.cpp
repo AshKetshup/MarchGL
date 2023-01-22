@@ -229,10 +229,13 @@ void MarchGL::main(void) {
 	double timeDiff;
 
 	unsigned int counter = 0;
-	//implicitSurface is = implicitSurface();
+	
 	//squareMarch sm = squareMarch(2, 2, 0.001);
 	torusObj to = torusObj();
-	cubeMarch cm = cubeMarch(5, 5, 5 , 1);
+	cubeMarch cm = cubeMarch();
+	//sphereObj so = sphereObj();
+
+
 	
 	while (!glfwWindowShouldClose(getWindow())) {
 		crntTime = glfwGetTime();
@@ -248,10 +251,13 @@ void MarchGL::main(void) {
 
 		refresh();
 
-		to.drawPoints(camera);
+		//to.drawPoints(camera);
 		//cm.drawGrid(camera);
-		to.drawGrid(camera);
-		to.drawBox(camera);
+		//to.drawGrid(camera);
+		//to.drawBox(camera);
+		//so.draw(camera);
+		//so.drawGrid(camera);
+		cm.drawMesh(camera);
 		
 
 		glfwSwapBuffers(window);

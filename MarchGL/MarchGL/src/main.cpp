@@ -87,6 +87,11 @@ int main(int argc, const char* argv[]) {
 		return -1;
 	}
 	
+	
+	int list[] = { 1,2,3 };
+
+	printf("%d\n", list[-1]);
+	
 
 
 	marchgl.main();
