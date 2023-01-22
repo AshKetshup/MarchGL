@@ -162,12 +162,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
+    <ClInclude Include="include\cubeMarch.h" />
     <ClInclude Include="include\filesys.hpp" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\glm\glm.hpp" />
     <ClInclude Include="include\implicit.h" />
     <ClInclude Include="include\marchgl.h" />
     <ClInclude Include="include\squareMarch.h" />
+    <ClInclude Include="include\torusObj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

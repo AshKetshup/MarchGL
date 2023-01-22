@@ -1,6 +1,9 @@
 #include "marchgl.h"
 #include "implicit.h"
 #include <squareMarch.h>
+#include <torusObj.h>
+#include <cubeMarch.h>
+
 
 namespace callback {
 	MarchGL* instance = nullptr;
@@ -226,13 +229,10 @@ void MarchGL::main(void) {
 	double timeDiff;
 
 	unsigned int counter = 0;
-	implicitSurface is = implicitSurface();
-	squareMarch sm = squareMarch(2, 2, 0.001);
-
-
-	std::vector<vec3> vec = sm.meshVertices;
-
-
+	//implicitSurface is = implicitSurface();
+	//squareMarch sm = squareMarch(2, 2, 0.001);
+	torusObj to = torusObj();
+	cubeMarch cm = cubeMarch(5, 5, 5 , 1);
 	
 	while (!glfwWindowShouldClose(getWindow())) {
 		crntTime = glfwGetTime();
@@ -248,13 +248,15 @@ void MarchGL::main(void) {
 
 		refresh();
 
-		//is.draw(camera);
-		sm.drawBorders(camera);
-		//sm.drawGrid(camera);
-		sm.drawMesh(camera);
+		to.drawPoints(camera);
+		//cm.drawGrid(camera);
+		to.drawGrid(camera);
+		to.drawBox(camera);
+		
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
 	}
 }
 
