@@ -93,6 +93,12 @@
     <ClInclude Include="include\squareMarch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\torusObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cubeMarch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\shader_m.h">
       <Filter>Header Files</Filter>
     </ClInclude>
