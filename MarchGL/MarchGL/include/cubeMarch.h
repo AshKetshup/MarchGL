@@ -6,7 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
-
+#include <random>
+#include <stdlib.h> 
 
 typedef struct {
 	vec3 p0;
@@ -318,7 +319,7 @@ class cubeMarch {
 public:
 	Shader basicShader; //simple shader
 	Shader shader; //color shader
-	GLuint VAO, meshVAO, gridVAO;
+	GLuint VAO, meshVAO, gridVAO, gridLinesVAO;
 	float radius = 1.0f; //radius of the sphere
 	std::vector<float> vertices; //vertices of the sphere
 	float gridDist = 0.01f; //distance between each vertice of the VOXELS (dist between every point in the grid)
@@ -326,9 +327,28 @@ public:
 	std::vector<float> cmgrid; //vertices of the grid
 	std::vector<VOXEL> voxels; //voxels 
 	std::vector<vec3> meshTriangles; //vertices for the triangles (mesh)
+	string obj;
+	//torus
+	float R1 = 1.0f;
+	float R2 = 0.5f;
+	//box limit
+	float box_lim[3] = { 0.0f, 0.0f, 0.0f };
+	cubeMarch(string obj) {
+		this->obj = obj;
 
+		if (obj == "torus") {
+			box_lim[0] = R1 + R2;
+			box_lim[1] = R1 + R2;
+			box_lim[2] = R2;
+			printf("asdsad\n");
+		}
+		if (obj == "sphere") {
+			box_lim[0] = radius;
+			box_lim[1] = radius;
+			box_lim[2] = radius;
+		}
 
-	cubeMarch() {
+		
 		shader = Shader("shaders/basicColorShader.vs", "shaders/basicColorShader.fs");
 		if (!shader.wasSuccessful()) {
 			cout << "Shader was not successful" << endl;
@@ -337,6 +357,8 @@ public:
 		createGrid();
 		marchingCubesSimple();
 		createMesh();
+		
+
 	}
 
 	//----sphere (for comparison)----
@@ -404,9 +426,9 @@ public:
 
 	//----grid----
 	void createGrid() {
-		for (float x = -(radius); x <= radius; x += gridDist) {
-			for (float y = -radius; y <= radius; y += gridDist) {
-				for (float z = -radius; z <= radius; z += gridDist) {
+		for (float x = -(box_lim[0]); x <= box_lim[0]; x += gridDist) {
+			for (float y = -box_lim[1]; y <= box_lim[1]; y += gridDist) {
+				for (float z = -box_lim[2]; z <= box_lim[2]; z += gridDist) {
 					//for marching cubes 
 					VOXEL tmp;
 					tmp.p0 = vec3(x, y, z);
@@ -423,15 +445,16 @@ public:
 					cmgrid.push_back(x);
 					cmgrid.push_back(y);
 					cmgrid.push_back(z);
-					cmgrid.push_back(1.0f);
-					cmgrid.push_back(1.0f);
-					cmgrid.push_back(1.0f);
+					cmgrid.push_back(0.9f);
+					cmgrid.push_back(0.58f);
+					cmgrid.push_back(0.47f);
+				
 
 				}
 			}
 		}
+		
 		gridPoints = cmgrid.size() / 6;
-
 		GLuint VBO;
 		glGenVertexArrays(1, &gridVAO);
 		glGenBuffers(1, &VBO);
@@ -445,8 +468,9 @@ public:
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(float)));
+		
 
 
 	}
@@ -465,29 +489,44 @@ public:
 
 		glBindVertexArray(gridVAO);
 		glEnable(GL_PROGRAM_POINT_SIZE);
-		glPointSize(5.0);
+		glPointSize(20.0);
 		glDrawArrays(GL_POINTS, 0, gridPoints);
 	}
+	
 
 
 	//-----marching cubes algorithm-----
 	
 	//cheks if the point is inside or outside the sphere
 	bool checkIsosurface(vec3 p) {
-		//x^2 + y^2 + z^2 = r^2
-		if (p.x * p.x + p.y * p.y + p.z * p.z <= radius * radius) return true;
-		else return false;
+		
+		if (obj == "torus") {
+			//x = (R1 + R2*cos(v)) * cos(u)
+			//y = (R1 + R2*cos(v)) * sin(u)
+			//z = R2 * sin(v)
+			//(sqrt(x^2+y^2) - R)^2 + z^2 = r^2
+			
+			return (pow(sqrt(p.x * p.x + p.y * p.y) - R1, 2) + p.z * p.z <= R2 * R2);
+		}
+		
+		//----default----
+		//x^2 + y^2 + z^2 = r^2 (sphere)
+		return (p.x * p.x + p.y * p.y + p.z * p.z <= radius * radius);
+	
+		
 	}
 	//returns the middle point between the two vertices
-	vec3 getIntersVertice(vec3 v1, vec3 v2) {
-		return vec3((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0, (v1.z + v2.z) / 2.0);
+	vec3 getIntersVertice(vec3 p1, vec3 p2) {
+		return vec3((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2);
 	}
+	
 	//marching cubes without isovalues
 	void marchingCubesSimple() {		
 		for (int i = 0; i < voxels.size(); i++) {
 			
 			//check what vertice is inside the sphere
 			string bin = "00000000";
+		
 			if (checkIsosurface(voxels[i].p0)) bin[7] = '1';
 			if (checkIsosurface(voxels[i].p1)) bin[6] = '1';
 			if (checkIsosurface(voxels[i].p2)) bin[5] = '1';
@@ -497,7 +536,7 @@ public:
 			if (checkIsosurface(voxels[i].p6)) bin[1] = '1';
 			if (checkIsosurface(voxels[i].p7)) bin[0] = '1';
 
-			if (bin == "00000000" || bin == "11111111") continue; //cube either doesn'r have any vertice in the shape, or as all of them
+			if (bin == "00000000" || bin == "11111111") continue; //cube either doesn't have any vertice in the shape, or as all of them
 
 			int case_n = std::stoi(bin, 0, 2); //case number (conversion from binary to decimal)
 			int edgesInters = edgeTable[case_n]; //edges that intersects the isosurface (binary)
@@ -537,18 +576,37 @@ public:
 
 	//----mesh----
 	void createMesh() {
-		GLuint VBO;
+		std::vector<vec3> colors;
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<> dist(0,1);
+		for(int i = 0; i<meshTriangles.size(); i+=3){
+			colors.push_back(vec3(dist(gen), dist(gen), dist(gen)));
+			colors.push_back(vec3(dist(gen), dist(gen), dist(gen)));
+			colors.push_back(vec3(dist(gen), dist(gen), dist(gen)));
+		}
+		
+		GLuint VBO, CBO;
 		glGenVertexArrays(1, &meshVAO);
 		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &CBO);
 		glBindVertexArray(meshVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, meshTriangles.size() * sizeof(vec3), &meshTriangles[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, CBO);
+		glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(vec3), &colors[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		
+		
 		glBindVertexArray(0);
+		
 
 	}
-	void drawMesh(Camera camera) {
+	void drawMesh(Camera camera, vec3 trans) {
 		glm::mat4 projection;
 		glm::mat4 view;
 		glm::mat4 model;
@@ -556,14 +614,13 @@ public:
 		projection = glm::perspective(glm::radians(camera.Zoom), (float)1920 / (float)1080, 0.1f, 100.0f);
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1.0f);
-		basicShader.use();
-		basicShader.setMat4("projection", projection);
-		basicShader.setMat4("view", view);
-		basicShader.setMat4("model", model);
+		model = glm::translate(model, trans);
+		shader.use();
+		shader.setMat4("projection", projection);
+		shader.setMat4("view", view);
+		shader.setMat4("model", model);
 
 		glBindVertexArray(meshVAO);
-		glEnable(GL_PROGRAM_POINT_SIZE);
-		glPointSize(5.0);
 		glDrawArrays(GL_TRIANGLES, 0, meshTriangles.size());
 	}
 

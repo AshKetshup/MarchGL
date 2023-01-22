@@ -88,9 +88,6 @@ int main(int argc, const char* argv[]) {
 	}
 	
 	
-	int list[] = { 1,2,3 };
-
-	printf("%d\n", list[-1]);
 	
 
 

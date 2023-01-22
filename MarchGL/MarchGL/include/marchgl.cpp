@@ -1,5 +1,4 @@
 #include "marchgl.h"
-#include "implicit.h"
 #include <squareMarch.h>
 #include <torusObj.h>
 #include <cubeMarch.h>
@@ -230,12 +229,8 @@ void MarchGL::main(void) {
 
 	unsigned int counter = 0;
 	
-	//squareMarch sm = squareMarch(2, 2, 0.001);
-	torusObj to = torusObj();
-	cubeMarch cm = cubeMarch();
-	//sphereObj so = sphereObj();
-
-
+	cubeMarch torus = cubeMarch("torus");
+	cubeMarch sphere = cubeMarch("sphere");
 	
 	while (!glfwWindowShouldClose(getWindow())) {
 		crntTime = glfwGetTime();
@@ -251,14 +246,9 @@ void MarchGL::main(void) {
 
 		refresh();
 
-		//to.drawPoints(camera);
-		//cm.drawGrid(camera);
-		//to.drawGrid(camera);
-		//to.drawBox(camera);
-		//so.draw(camera);
-		//so.drawGrid(camera);
-		cm.drawMesh(camera);
 		
+		torus.drawMesh(camera, vec3(0.0f));
+		sphere.drawMesh(camera, vec3(5.0f));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
