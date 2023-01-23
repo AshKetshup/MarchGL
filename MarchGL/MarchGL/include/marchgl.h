@@ -113,7 +113,9 @@ class MarchGL {
 
 	render_mode rmode;
 	unsigned threadAmount;
+
 	Arguments args;
+	SHADER_SETTINGS s;
 
 	GLFWwindow* window;
 	unsigned scr_width;

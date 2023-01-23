@@ -41,7 +41,7 @@ class cubeMarch {
 	std::vector<glm::vec3> meshTriangles;			//vertices for the triangles (mesh)
 	string obj;
 
-	unsigned width, height = 0;
+	int width, height = 0;
 
 	//torus
 	float R1 = 1.0f;
@@ -50,7 +50,7 @@ class cubeMarch {
 	//box limit
 	glm::vec3 box_lim = glm::vec3(0.0f);
 
-	cubeMarch(unsigned w, unsigned h, std::string obj = "sphere");
+	cubeMarch(int w, int h, std::string obj = "sphere");
 
 	//----sphere (for comparison)----
 	void createSphere();

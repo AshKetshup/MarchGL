@@ -285,7 +285,6 @@ void MarchGL::main(void) {
 
 		refresh();
 
-		SHADER_SETTINGS s;
 		s.cameraLightSnap = cameraLightSnap;
 		s.lightPos = lightPos;
 		s.colorLight = vec4(lightColor.x, lightColor.y, lightColor.z, lightColor.w);

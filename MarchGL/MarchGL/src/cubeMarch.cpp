@@ -1,6 +1,8 @@
 #include "cubeMarch.h"
 
-cubeMarch::cubeMarch(unsigned w, unsigned h, std::string obj) {
+#include <glm/gtx/normal.hpp>
+
+cubeMarch::cubeMarch(int w, int h, std::string obj) {
 	this->obj = obj;
 
 	if (obj == "torus")
@@ -256,14 +258,21 @@ void cubeMarch::marchingCubesSimple() {
 void cubeMarch::createMesh() {
 	std::cout << "Create Mesh: ... ";
 
-	std::vector<glm::vec3> colors;
+	std::vector<glm::vec3> normals;
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dist(0, 1);
 	for (int i = 0; i < meshTriangles.size(); i += 3) {
-		colors.push_back(glm::vec3(dist(gen), dist(gen), dist(gen)));
-		colors.push_back(glm::vec3(dist(gen), dist(gen), dist(gen)));
-		colors.push_back(glm::vec3(dist(gen), dist(gen), dist(gen)));
+		glm::vec3 a, b, c, normal;
+		a = meshTriangles[i];
+		b = meshTriangles[i + 1];
+		c = meshTriangles[i + 2];
+
+		normal = -glm::normalize(glm::triangleNormal(a, b, c));
+
+		normals.push_back(normal);
+		normals.push_back(normal);
+		normals.push_back(normal);
 	}
 
 	unsigned VBO, CBO;
@@ -277,7 +286,7 @@ void cubeMarch::createMesh() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, CBO);
-	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(glm::vec3), &colors[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
 
@@ -293,10 +302,12 @@ void cubeMarch::drawMesh(Camera camera, glm::vec3 trans, SHADER_SETTINGS& settin
 	glm::mat4 view;
 	glm::mat4 model;
 
-	projection = glm::perspective(glm::radians(camera.Zoom), (float) 1920 / (float) 1080, 0.1f, 100.0f);
+	constexpr float ratio = (float) 1920 / (float) 1080;
+	projection = glm::perspective(glm::radians(camera.Zoom), ratio, 0.1f, 100.0f);
 	view = camera.GetViewMatrix();
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, trans);
+
 	shader.use();
 	shader.setMat4("projection", projection);
 	shader.setMat4("view", view);
