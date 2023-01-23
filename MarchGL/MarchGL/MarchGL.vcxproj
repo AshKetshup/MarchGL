@@ -86,6 +86,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)Dependencies\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,6 +109,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib;glew32s.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)Dependencies\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\cubeMarch.cpp" />
     <ClCompile Include="src\imgui.cpp" />
     <ClCompile Include="src\imgui_demo.cpp" />
     <ClCompile Include="src\imgui_draw.cpp" />
@@ -153,7 +156,6 @@
     <ClCompile Include="src\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\imgui_tables.cpp" />
     <ClCompile Include="src\imgui_widgets.cpp" />
-    <ClCompile Include="src\implicit.cpp" />
     <ClCompile Include="src\marchgl.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp">
@@ -166,8 +168,8 @@
     <None Include="basicColorShader.vs" />
     <None Include="res\shaders\shader_fs.glsl" />
     <None Include="res\shaders\shader_vs.glsl" />
-    <None Include="shaders\basicShader.fs" />
-    <None Include="shaders\basicShader.vs" />
+    <None Include="shaders\basicShader_fs.glsl" />
+    <None Include="shaders\basicShader_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
@@ -185,7 +187,9 @@
     <ClInclude Include="include\imstb_rectpack.h" />
     <ClInclude Include="include\imstb_textedit.h" />
     <ClInclude Include="include\imstb_truetype.h" />
+    <ClInclude Include="include\main.h" />
     <ClInclude Include="include\marchgl.h" />
+    <ClInclude Include="include\marchingUtils.h" />
     <ClInclude Include="include\shader_m.h" />
     <ClInclude Include="include\squareMarch.h" />
     <ClInclude Include="include\stb_image.h" />

@@ -30,9 +30,6 @@
     <ClCompile Include="src\squareMarch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\implicit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,14 +51,17 @@
     <ClCompile Include="src\imgui_tables.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\cubeMarch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\shader_vs.glsl" />
     <None Include="res\shaders\shader_fs.glsl" />
-    <None Include="shaders\basicShader.fs">
+    <None Include="shaders\basicShader_fs.glsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\basicShader.vs">
+    <None Include="shaders\basicShader_vs.glsl">
       <Filter>shaders</Filter>
     </None>
     <None Include="basicColorShader.vs">
@@ -133,6 +133,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\imconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\marchingUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

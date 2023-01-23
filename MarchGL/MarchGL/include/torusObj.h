@@ -1,20 +1,16 @@
+#ifndef TORUSOBJ_H
+#define TORUSOBJ_H
+
 #include <math.h>
-#include <glad/glad.h>
 #include <vector>
 #include <shader_m.h>
 #include <camera.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <GLFW/glfw3.h>
 
 #define M_PI 3.1415927
 
 
-
-
 class torusObj {
-public:
+	public:
 	float R1 = 2;
 	float R2 = 1;
 	float dist = 0.01;
@@ -28,7 +24,7 @@ public:
 
 	torusObj() {
 		//shadders
-		shader = Shader("shaders/basicColorShader.vs", "shaders/basicColorShader.fs");
+		shader = Shader("shaders/basicColorShader_vs.glsl", "shaders/basicColorShader_fs.glsl");
 		if (!shader.wasSuccessful()) {
 			cout << "Shader was not successful" << endl;
 		}
@@ -42,10 +38,10 @@ public:
 	//torus implicit function
 	void createPoints() {
 
-		for (float u = 0; u < 2*M_PI; u+=dist) {
-			for (float v = 0; v < 2*M_PI; v+=dist) {
-				float x = (R1 + (R2 * cos(v))) * cos(u);
-				float y = (R1 + (R2 * cos(v))) * sin(u);
+		for (float u = 0; u < 2 * M_PI; u += dist) {
+			for (float v = 0; v < 2 * M_PI; v += dist) {
+				float x = ( R1 + ( R2 * cos(v) ) ) * cos(u);
+				float y = ( R1 + ( R2 * cos(v) ) ) * sin(u);
 				float z = R2 * sin(v);
 
 				vertices.push_back(x);
@@ -58,7 +54,7 @@ public:
 			}
 		}
 
-		
+
 
 		points = vertices.size() / 6;
 
@@ -73,19 +69,19 @@ public:
 
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	
-		
-	
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) ( 3 * sizeof(float) ));
+
+
+
 	}
 	void drawPoints(Camera camera) {
 		glm::mat4 projection;
 		glm::mat4 view;
 		glm::mat4 model;
 
-		projection = glm::perspective(glm::radians(camera.Zoom), (float)1920 / (float)1080, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.Zoom), (float) 1920 / (float) 1080, 0.1f, 100.0f);
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1.0f);
 		shader.use();
@@ -98,29 +94,29 @@ public:
 		glPointSize(5.0);
 		glDrawArrays(GL_POINTS, 0, points);
 	}
-	
+
 	//bounding box
-	void createBoundingBox() {	
+	void createBoundingBox() {
 		float vertices[] = {
 			//up
-			(R1 + R2), -(R1 + R2), R2, 1.0f, 1.0f, 1.0f,//br
-			(R1 + R2), (R1 + R2), R2, 1.0f, 1.0f, 1.0f,//tr
-			-(R1 + R2), (R1 + R2), R2, 1.0f, 1.0f, 1.0f,//tl
-			-(R1 + R2), -(R1 + R2), R2, 1.0f, 1.0f, 1.0f,//bl
+			( R1 + R2 ), -( R1 + R2 ), R2, 1.0f, 1.0f, 1.0f,//br
+			( R1 + R2 ), ( R1 + R2 ), R2, 1.0f, 1.0f, 1.0f,//tr
+			-( R1 + R2 ), ( R1 + R2 ), R2, 1.0f, 1.0f, 1.0f,//tl
+			-( R1 + R2 ), -( R1 + R2 ), R2, 1.0f, 1.0f, 1.0f,//bl
 			//bottom
-			-(R1 + R2), -(R1 + R2), -R2, 1.0f, 1.0f, 1.0f,//bl
-			(R1 + R2), -(R1 + R2), -R2, 1.0f, 1.0f, 1.0f,//br
-			(R1 + R2), (R1 + R2), -R2, 1.0f, 1.0f, 1.0f,//tr
-			-(R1 + R2), (R1 + R2), -R2, 1.0f, 1.0f, 1.0f, //tl
+			-( R1 + R2 ), -( R1 + R2 ), -R2, 1.0f, 1.0f, 1.0f,//bl
+			( R1 + R2 ), -( R1 + R2 ), -R2, 1.0f, 1.0f, 1.0f,//br
+			( R1 + R2 ), ( R1 + R2 ), -R2, 1.0f, 1.0f, 1.0f,//tr
+			-( R1 + R2 ), ( R1 + R2 ), -R2, 1.0f, 1.0f, 1.0f, //tl
 			//sides
-			-(R1 + R2), -(R1 + R2), R2, 1.0f, 1.0f, 1.0f,//bl
-			-(R1 + R2), -(R1 + R2), -R2, 1.0f, 1.0f, 1.0f,//bl
-			(R1 + R2), -(R1 + R2), R2, 1.0f, 1.0f, 1.0f,//br
-			(R1 + R2), -(R1 + R2), -R2, 1.0f, 1.0f, 1.0f,//br
-			(R1 + R2), (R1 + R2), R2, 1.0f, 1.0f, 1.0f,//tr
-			(R1 + R2), (R1 + R2), -R2, 1.0f, 1.0f, 1.0f,//tr
-			-(R1 + R2), (R1 + R2), R2, 1.0f, 1.0f, 1.0f,//tl
-			-(R1 + R2), (R1 + R2), -R2, 1.0f, 1.0f, 1.0f, //tl
+			-( R1 + R2 ), -( R1 + R2 ), R2, 1.0f, 1.0f, 1.0f,//bl
+			-( R1 + R2 ), -( R1 + R2 ), -R2, 1.0f, 1.0f, 1.0f,//bl
+			( R1 + R2 ), -( R1 + R2 ), R2, 1.0f, 1.0f, 1.0f,//br
+			( R1 + R2 ), -( R1 + R2 ), -R2, 1.0f, 1.0f, 1.0f,//br
+			( R1 + R2 ), ( R1 + R2 ), R2, 1.0f, 1.0f, 1.0f,//tr
+			( R1 + R2 ), ( R1 + R2 ), -R2, 1.0f, 1.0f, 1.0f,//tr
+			-( R1 + R2 ), ( R1 + R2 ), R2, 1.0f, 1.0f, 1.0f,//tl
+			-( R1 + R2 ), ( R1 + R2 ), -R2, 1.0f, 1.0f, 1.0f, //tl
 		};
 
 		GLuint VBO;
@@ -134,11 +130,11 @@ public:
 
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		  
-		
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) ( 3 * sizeof(float) ));
+
+
 
 
 	}
@@ -147,7 +143,7 @@ public:
 		glm::mat4 view;
 		glm::mat4 model;
 
-		projection = glm::perspective(glm::radians(camera.Zoom), (float)1920 / (float)1080, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.Zoom), (float) 1920 / (float) 1080, 0.1f, 100.0f);
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1.0f);
 		shader.use();
@@ -164,14 +160,14 @@ public:
 		glDrawArrays(GL_LINE_LOOP, 12, 2);
 		glDrawArrays(GL_LINE_LOOP, 14, 2);
 
-		
-		
+
+
 	}
 
 	//grid
 	void createGrid() {
-		for (float x = -(R1 + R2); x <= (R1 + R2) ; x += gridDist) {
-			for (float y = -(R1 + R2); y <= (R1 + R2); y += gridDist) {
+		for (float x = -( R1 + R2 ); x <= ( R1 + R2 ); x += gridDist) {
+			for (float y = -( R1 + R2 ); y <= ( R1 + R2 ); y += gridDist) {
 				for (float z = -R2; z <= R2; z += gridDist) {
 					cmgrid.push_back(x);
 					cmgrid.push_back(y);
@@ -180,7 +176,7 @@ public:
 					cmgrid.push_back(1.0f);
 					cmgrid.push_back(1.0f);
 					cmgrid.push_back(1.0f);
-					
+
 				}
 			}
 		}
@@ -197,11 +193,11 @@ public:
 
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) ( 3 * sizeof(float) ));
 
-		
+
 
 	}
 	void drawGrid(Camera camera) {
@@ -209,7 +205,7 @@ public:
 		glm::mat4 view;
 		glm::mat4 model;
 
-		projection = glm::perspective(glm::radians(camera.Zoom), (float)1920 / (float)1080, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.Zoom), (float) 1920 / (float) 1080, 0.1f, 100.0f);
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1.0f);
 		shader.use();
@@ -231,8 +227,10 @@ public:
 		//check the positiion of all vertices in regard of the torus
 		//check the case 
 		//check the table
-		
+
 	}
-	
+
 
 };
+
+#endif

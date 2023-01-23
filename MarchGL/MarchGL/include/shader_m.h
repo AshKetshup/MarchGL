@@ -89,6 +89,8 @@ class Shader {
 			vShaderStream << vShaderFile.rdbuf();
 			vShaderFile.close();
 			vertexCode = vShaderStream.str();
+
+			cout << "-- VERTEX SHADER --" << endl << vertexCode << endl;
 		} catch (ifstream::failure& e) {
 			report.setReport(TYPE_READING | SHADER_VERTEX, string(e.what()));
 			return;
@@ -100,6 +102,8 @@ class Shader {
 			fShaderStream << fShaderFile.rdbuf();
 			fShaderFile.close();
 			fragmentCode = fShaderStream.str();
+
+			cout << "-- FRAGMENT SHADER --" << endl << fragmentCode << endl;
 		} catch (ifstream::failure& e) {
 			report.setReport(TYPE_READING | SHADER_FRAGMENT, string(e.what()));
 			return;

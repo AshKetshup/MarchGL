@@ -1,6 +1,8 @@
 #include "marchgl.h"
 
 #include "mutils.h"
+#include <limits>
+
 
 namespace callback {
 	MarchGL* instance = nullptr;
@@ -26,8 +28,21 @@ namespace callback {
 				leftBtnDown = false;
 		}
 
-		if (!leftBtnDown)
+		bool rightBtnDown = false;
+		if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+			if (GLFW_PRESS == action)
+				rightBtnDown = true;
+			else if (GLFW_RELEASE == action)
+				rightBtnDown = false;
+		}
+
+		if (rightBtnDown)
+			getInstance()->switchGUIMode(!getInstance()->getGUIMode());
+
+
+		if (!leftBtnDown) {
 			return;
+		}
 
 		double x, y;
 		glfwGetCursorPos(getInstance()->getWindow(), &x, &y);
@@ -79,6 +94,7 @@ bool MarchGL::initializeGLFW(unsigned int width, unsigned int height, const char
 	setMouseButtonCallback(callback::mouseBtn);
 	setCursorPositionCallback(callback::mouse);
 	setScrollCallback(callback::mouseScroll);
+
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -250,9 +266,12 @@ void MarchGL::main(void) {
 	double crntTime = 0.0;
 	double timeDiff;
 
-	unsigned int counter = 0;
+	unsigned counter = 0;
 
 	initializeImGUI();
+
+	cubeMarch torus = cubeMarch("torus");
+	//cubeMarch sphere = cubeMarch("sphere");
 
 	while (!glfwWindowShouldClose(getWindow())) {
 		crntTime = glfwGetTime();
@@ -268,8 +287,10 @@ void MarchGL::main(void) {
 
 		refresh();
 
-		//sm.drawBorders(camera);
-		//sm.drawMesh(camera);
+		torus.drawMesh(camera, vec3(0.0f));
+		//sphere.drawMesh(camera, vec3(5.0f));
+
+		renderUI();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -300,6 +321,8 @@ action MarchGL::processInput(void) {
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 		return action::CAMERA_RESET;
 
+	glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+
 	return action::NO_ACTION;
 }
 
@@ -310,8 +333,17 @@ void MarchGL::newFrameUI(void) {
 }
 
 void MarchGL::renderUI(void) {
-	ImGui::Begin("ImGUI Window!");
-	ImGui::Text("Hello there!");
+	ImGui::Begin("Shader Settings");
+	ImGui::Text("Mesh Color");
+	ImGui::ColorEdit3("", &meshColor.x);
+
+	ImGui::Text("Light Color");
+	ImGui::ColorEdit3("", &lightColor.x);
+
+	ImGui::Checkbox("Snap light to camera", &cameraLightSnap);
+
+	ImGui::SliderFloat3("Light Position", &lightPos.x, -200.f, 200.f);
+
 	ImGui::End();
 
 	ImGui::Render();
@@ -339,16 +371,14 @@ void MarchGL::refresh(void) {
 			cout << "Camera Reset." << endl;
 			break;
 		case action::CHANGE_COLOR:
-
+			break;
 		case action::CHANGE_SHADER:
 		case action::SHADER_RELOAD:
-
+			break;
 		case action::NO_ACTION:
 		default:
 			break;
 	}
-
-	renderUI();
 }
 
 void MarchGL::terminate(void) {

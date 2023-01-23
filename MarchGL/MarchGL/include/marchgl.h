@@ -17,8 +17,11 @@
 #include <filesystem>
 #include <iostream>
 
-#include "implicit.h"
+//#include "implicit.h"
 #include "squareMarch.h"
+#include <cubeMarch.h>
+
+#include <torusObj.h>
 
 using namespace std;
 using namespace glm;
@@ -91,6 +94,7 @@ class MarchGL {
 	void main(void);
 
 	private:
+
 	static constexpr vec3 SURF_DEFAULT_COLOR = vec3(50.f / 255.f, 140.f / 255.f, 235.f / 255.f);
 	static constexpr vec3 BG_DEFAULT_COLOR = vec3(0.53f, 0.81f, 0.98f);
 	bool success = false;
@@ -116,6 +120,12 @@ class MarchGL {
 	unsigned scr_height;
 
 	ImGuiIO io;
+	ImVec4 meshColor = ImVec4(SURF_DEFAULT_COLOR.x, SURF_DEFAULT_COLOR.y, SURF_DEFAULT_COLOR.z, 1.f);
+	ImVec4 lightColor = ImVec4(1.f, 1.f, 1.f, 1.f);
+	bool cameraLightSnap = false;
+	vec3 lightPos = vec3(0.f);
+
+
 
 	// Timing 
 	float deltaTime = 0.0f;
