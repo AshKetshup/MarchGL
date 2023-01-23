@@ -1,30 +1,21 @@
 #include "cubeMarch.h"
 
-cubeMarch::cubeMarch(std::string obj) {
-
-
+cubeMarch::cubeMarch(unsigned w, unsigned h, std::string obj) {
 	this->obj = obj;
 
-	if (obj == "torus") {
-		box_lim[0] = R1 + R2;
-		box_lim[1] = R1 + R2;
-		box_lim[2] = R2;
-		printf("asdsad\n");
-	}
-	if (obj == "sphere") {
-		box_lim[0] = radius;
-		box_lim[1] = radius;
-		box_lim[2] = radius;
-	}
+	if (obj == "torus")
+		box_lim = glm::vec3(R1 + R2, R1 + R2, R2);
+
+	if (obj == "sphere")
+		box_lim = glm::vec3(radius);
 
 	std::cout << "LOADING CubeMarch SHADER: ... " << std::endl << std::endl;
 	shader = Shader("shaders/basicShader_vs.glsl", "shaders/basicShader_fs.glsl");
 	if (!shader.wasSuccessful()) {
 		std::cout << "Shader was not successful" << std::endl;
 		std::cout << shader.getReport() << std::endl;
-	} else {
+	} else
 		std::cout << std::endl << "[DONE]" << std::endl;
-	}
 
 
 	createSphere();
@@ -46,7 +37,7 @@ void cubeMarch::createSphere() {
 
 
 	//----------------------------------------sphere---------------------------------------
-	//sphere formula = x^2 + y^2 + z^2 = r^2
+	// sphere formula = x^2 + y^2 + z^2 = r^2
 	// (=) z = sqrt(r^2 - x^2 - y^2)
 
 	//2y(y^{2}-3x^{2})(1-z^{2})+(x^{2}+y^{2})^{2}-(9z^{2}-1)(1-z^{2})=0
@@ -81,7 +72,7 @@ void cubeMarch::drawSphere(Camera camera) {
 	glm::mat4 view;
 	glm::mat4 model;
 
-	projection = glm::perspective(glm::radians(camera.Zoom), (float) 1920 / (float) 1080, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(camera.Zoom), (float) width / (float) height, 0.1f, 100.0f);
 	view = camera.GetViewMatrix();
 	model = glm::mat4(1.0f);
 	shader.use();
@@ -214,20 +205,27 @@ void cubeMarch::marchingCubesSimple() {
 		if (checkIsosurface(voxels[i].p6)) bin[1] = '1';
 		if (checkIsosurface(voxels[i].p7)) bin[0] = '1';
 
-		if (bin == "00000000" || bin == "11111111") continue; //cube either doesn't have any vertice in the shape, or as all of them
+		//cube either doesn't have any vertice in the shape, or as all of them
+		if (bin == "00000000" || bin == "11111111")
+			continue;
 
-		int case_n = std::stoi(bin, 0, 2); //case number (conversion from binary to decimal)
-		int edgesInters = tbl::edgeTable[case_n]; //edges that intersects the isosurface (binary)
+		//case number (conversion from binary to decimal)
+		int case_n = std::stoi(bin, 0, 2);
 
-
+		//edges that intersects the isosurface (binary)
+		int edgesInters = tbl::edgeTable[case_n];
 
 		//get all the vertices for the triangles
 		glm::vec3 vertices[12];
-		if (edgesInters == 0) continue; //no edges intersect the isosurface
-		//(edgesInters & 1) -> verifies if the the right most bit of edgesInters is 1
-		//this allows to check if the edge 0 is in the edges intersected by the implicit function
-		//f.e: edgesInters=0011 -> true
-		//	   edgesInters=0100 -> false
+
+		//no edges intersect the isosurface
+		if (edgesInters == 0)
+			continue;
+
+		// (edgesInters & 1) -> verifies if the the right most bit of edgesInters is 1
+		// this allows to check if the edge 0 is in the edges intersected by the implicit function
+		// f.e: edgesInters = 0011 -> true
+		//      edgesInters = 0100 -> false
 		if (edgesInters & 1) vertices[0] = ( getIntersVertice(voxels[i].p0, voxels[i].p1) ); //edge 0
 		if (edgesInters & 2) vertices[1] = ( getIntersVertice(voxels[i].p1, voxels[i].p2) ); //edge 1
 		if (edgesInters & 4) vertices[2] = ( getIntersVertice(voxels[i].p2, voxels[i].p3) ); //edge 2
@@ -242,7 +240,7 @@ void cubeMarch::marchingCubesSimple() {
 		if (edgesInters & 2048) vertices[11] = ( getIntersVertice(voxels[i].p3, voxels[i].p7) ); //edge 11
 
 
-		//adds the triangles vertices in the correct order to the meshTriangles list
+		// Adds the triangles vertices in the correct order to the meshTriangles list
 		for (int n = 0; tbl::triTable[case_n][n] != -1; n += 3) {
 			meshTriangles.push_back(vertices[tbl::triTable[case_n][n]]);
 			meshTriangles.push_back(vertices[tbl::triTable[case_n][n + 1]]);
@@ -288,7 +286,7 @@ void cubeMarch::createMesh() {
 	std::cout << "[DONE]" << std::endl;
 }
 
-void cubeMarch::drawMesh(Camera camera, glm::vec3 trans) {
+void cubeMarch::drawMesh(Camera camera, glm::vec3 trans, SHADER_SETTINGS& settings) {
 	//std::cout << "Draw Mesh: ...";
 
 	glm::mat4 projection;
@@ -303,6 +301,12 @@ void cubeMarch::drawMesh(Camera camera, glm::vec3 trans) {
 	shader.setMat4("projection", projection);
 	shader.setMat4("view", view);
 	shader.setMat4("model", model);
+
+	shader.setVec4("objectColor", settings.colorMesh);
+
+	shader.setVec4("lamp.lightColor", settings.colorLight);
+	shader.setVec3("lamp.lightPos", ( settings.cameraLightSnap ) ? camera.Position : settings.lightPos);
+	shader.setVec3("lamp.viewPos", camera.Position);
 
 	glBindVertexArray(meshVAO);
 	glDrawArrays(GL_TRIANGLES, 0, meshTriangles.size());

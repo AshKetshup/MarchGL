@@ -1,8 +1,6 @@
 #include "marchgl.h"
 
 #include "mutils.h"
-#include <limits>
-
 
 namespace callback {
 	MarchGL* instance = nullptr;
@@ -270,7 +268,7 @@ void MarchGL::main(void) {
 
 	initializeImGUI();
 
-	cubeMarch torus = cubeMarch("torus");
+	cubeMarch torus = cubeMarch(scr_width, scr_height, "torus");
 	//cubeMarch sphere = cubeMarch("sphere");
 
 	while (!glfwWindowShouldClose(getWindow())) {
@@ -287,7 +285,13 @@ void MarchGL::main(void) {
 
 		refresh();
 
-		torus.drawMesh(camera, vec3(0.0f));
+		SHADER_SETTINGS s;
+		s.cameraLightSnap = cameraLightSnap;
+		s.lightPos = lightPos;
+		s.colorLight = vec4(lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+		s.colorMesh = vec4(meshColor.x, meshColor.y, meshColor.z, meshColor.w);
+
+		torus.drawMesh(camera, vec3(0.0f), s);
 		//sphere.drawMesh(camera, vec3(5.0f));
 
 		renderUI();
@@ -333,18 +337,28 @@ void MarchGL::newFrameUI(void) {
 }
 
 void MarchGL::renderUI(void) {
-	ImGui::Begin("Shader Settings");
-	ImGui::Text("Mesh Color");
-	ImGui::ColorEdit3("", &meshColor.x);
+	{
+		ImGui::Begin("Shader Settings");
+		ImGui::Text("Mesh Color");
+		ImGui::ColorEdit3("", &meshColor.x);
 
-	ImGui::Text("Light Color");
-	ImGui::ColorEdit3("", &lightColor.x);
+		ImGui::Text("Light Color");
+		ImGui::ColorEdit3("", &lightColor.x);
 
-	ImGui::Checkbox("Snap light to camera", &cameraLightSnap);
+		ImGui::Checkbox("Snap light to camera", &cameraLightSnap);
 
-	ImGui::SliderFloat3("Light Position", &lightPos.x, -200.f, 200.f);
+		ImGui::SliderFloat3("Light Position", &lightPos.x, -200.f, 200.f);
 
-	ImGui::End();
+		ImGui::End();
+	}
+
+	{
+		ImGui::Begin("Render Settings");
+		//ImGui::RadioButton();
+		ImGui::End();
+	}
+
+
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

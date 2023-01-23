@@ -19,6 +19,14 @@ typedef struct {
 	glm::vec3 p7;
 } VOXEL;
 
+
+typedef struct {
+	glm::vec4 colorMesh;
+	glm::vec4 colorLight;
+	bool cameraLightSnap;
+	glm::vec3 lightPos;
+} SHADER_SETTINGS;
+
 class cubeMarch {
 	public:
 	Shader basicShader;								//simple shader
@@ -33,13 +41,16 @@ class cubeMarch {
 	std::vector<glm::vec3> meshTriangles;			//vertices for the triangles (mesh)
 	string obj;
 
+	unsigned width, height = 0;
+
 	//torus
 	float R1 = 1.0f;
 	float R2 = 0.5f;
-	//box limit
-	float box_lim[3] = { 0.0f, 0.0f, 0.0f };
 
-	cubeMarch(std::string obj = "sphere");
+	//box limit
+	glm::vec3 box_lim = glm::vec3(0.0f);
+
+	cubeMarch(unsigned w, unsigned h, std::string obj = "sphere");
 
 	//----sphere (for comparison)----
 	void createSphere();
@@ -62,7 +73,7 @@ class cubeMarch {
 
 	//----mesh----
 	void createMesh();
-	void drawMesh(Camera camera, glm::vec3 trans);
+	void drawMesh(Camera camera, glm::vec3 trans, SHADER_SETTINGS& settings);
 };
 
 #endif

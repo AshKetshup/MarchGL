@@ -11,7 +11,7 @@ struct Lamp {
     vec3 viewPos;
 };
 
-uniform vec3 objectColor;
+uniform vec4 objectColor;
 uniform Lamp lamp;
 
 void main() {
@@ -41,7 +41,7 @@ void main() {
     // result
     vec3 result = vec3(0.0);
     result += (ambient + diffuse + specular);
-    result *= objectColor;
+    result *= objectColor.xyz;
 
     FragColor = vec4(result, 1.0);
 }
