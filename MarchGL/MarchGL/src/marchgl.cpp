@@ -268,7 +268,7 @@ void MarchGL::main(void) {
 
 	initializeImGUI();
 
-	cubeMarch torus = cubeMarch(scr_width, scr_height, "torus");
+	cubeMarch torus = cubeMarch( "torus");
 	//cubeMarch sphere = cubeMarch("sphere");
 
 	while (!glfwWindowShouldClose(getWindow())) {
@@ -291,8 +291,10 @@ void MarchGL::main(void) {
 		s.colorMesh = vec4(meshColor.x, meshColor.y, meshColor.z, meshColor.w);
 
 		torus.drawMesh(camera, vec3(0.0f), s);
-		//sphere.drawMesh(camera, vec3(5.0f));
-
+		//torus.drawGrid(camera);
+		//sphere.drawMesh(camera, vec3(3.0f), s);
+		//sphere.drawSphere(camera);
+		//sphere.drawGrid(camera);
 		renderUI();
 
 		glfwSwapBuffers(window);
