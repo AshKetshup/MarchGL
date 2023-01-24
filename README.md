@@ -22,7 +22,7 @@ Iso-Surfaces using Marching Cubes in Modern OpenGL
 		- Vertice: 0000 0001
 		- Edges: 0000 0000 1100
 	  1. Calculate the middle points of each edge
-	  2. Add does vertices to a list
+	  2. Add those vertices to a list
 	  3. "Organize" the vertices, in a way that the correct triangles are drawn (third table)
 
 

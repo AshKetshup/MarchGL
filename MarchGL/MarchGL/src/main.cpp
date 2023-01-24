@@ -65,6 +65,10 @@ int main(int argc, const char* argv[]) {
 		return -1;
 	}
 
+
+	unsigned int n = std::thread::hardware_concurrency();
+	std::cout << n << " concurrent threads are supported.\n";
+
 	marchgl.main();
 
 	return 0;

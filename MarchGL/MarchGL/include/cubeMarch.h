@@ -9,14 +9,7 @@
 #include "marchingutils.h"
 
 typedef struct {
-	glm::vec3 p0;
-	glm::vec3 p1;
-	glm::vec3 p2;
-	glm::vec3 p3;
-	glm::vec3 p4;
-	glm::vec3 p5;
-	glm::vec3 p6;
-	glm::vec3 p7;
+	glm::vec3 p[8];
 } VOXEL;
 
 
@@ -29,15 +22,15 @@ typedef struct {
 
 class cubeMarch {
 	public:
-	Shader basicShader;								//simple shader
-	Shader shader;									//color shader
+	Shader basicShader;								//color shader
+	Shader shader;									//
 	unsigned VAO, meshVAO, gridVAO, gridLinesVAO;
 	float radius = 1.0f;							//radius of the sphere
 	std::vector<float> vertices;					//vertices of the sphere
 	float gridDist = 0.01f;							//distance between each vertice of the VOXELS (dist between every point in the grid)
 	int gridPoints;									//total grid points (for drawing)
 	std::vector<float> cmgrid;						//vertices of the grid
-	std::vector<VOXEL> voxels;						//voxels 
+	std::vector<VOXEL> voxels;									//voxels
 	std::vector<glm::vec3> meshTriangles;			//vertices for the triangles (mesh)
 	string obj;
 
@@ -50,7 +43,7 @@ class cubeMarch {
 	//box limit
 	glm::vec3 box_lim = glm::vec3(0.0f);
 
-	cubeMarch(int w, int h, std::string obj = "sphere");
+	cubeMarch(std::string obj = "sphere");
 
 	//----sphere (for comparison)----
 	void createSphere();
@@ -63,10 +56,10 @@ class cubeMarch {
 	//-----marching cubes algorithm-----
 
 	//checks if the point is inside or outside the sphere
-	bool checkIsosurface(glm::vec3 p);
+	float getDensity(glm::vec3 p);
 
 	//returns the middle point between the two vertices
-	glm::vec3 getIntersVertice(glm::vec3 p1, glm::vec3 p2);
+	glm::vec3 getIntersVertice(glm::vec3 p1, glm::vec3 p2, float D1, float D2);
 
 	//marching cubes without isovalues
 	void marchingCubesSimple();
