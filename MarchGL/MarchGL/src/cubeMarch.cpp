@@ -111,6 +111,8 @@ void cubeMarch::generate(void) {
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl;
 
+	meshTriangles.clear();
+	normals.clear();
 
 	std::cout << "Running Marching Cube" << std::endl;
 	for (float x = -renderSettings.gridSize.x; x < renderSettings.gridSize.x; x += renderSettings.cubeSize)
@@ -243,13 +245,12 @@ glm::vec3 cubeMarch::getIntersVertice(glm::vec3 p1, glm::vec3 p2, float D1, floa
 
 	float t = -D1 / ( D2 - D1 );
 
-	glm::vec3 tmp = ( 1 - t ) * p1 + t * p2;
-	if (tmp.z > radius) {
+	/*if (tmp.z > radius) {
 		std::cout << "----------------------" << std::endl;
 		std::cout << "p1: " << p1.x << ", " << p1.y << ", " << p1.z << std::endl;
 		std::cout << "p2: " << p2.x << ", " << p2.y << ", " << p2.z << std::endl;
 		std::cout << "----------------------" << std::endl;
-	}
+	}*/
 	//return (p1 + p2) / 2.0f;
 	return ( 1 - t ) * p1 + t * p2;
 }

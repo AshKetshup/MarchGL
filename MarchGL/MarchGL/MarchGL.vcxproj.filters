@@ -84,6 +84,7 @@
     </None>
     <None Include="res\shaders\basicColorShader_fs.glsl" />
     <None Include="res\shaders\basicColorShader_vs.glsl" />
+    <None Include="res\shaders\marchingcubes_cs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\filesys.hpp">
@@ -186,6 +187,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\cparse\builtin-features\typeSpecificFunctions_inc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\computeshader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

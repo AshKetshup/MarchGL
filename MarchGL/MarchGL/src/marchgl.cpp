@@ -300,7 +300,7 @@ void MarchGL::main(void) {
 }
 
 action MarchGL::processInput(void) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
 	camera.MovementSpeed = ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS )
