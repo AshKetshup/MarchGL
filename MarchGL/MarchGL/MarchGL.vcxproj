@@ -75,11 +75,12 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)MarchGL\include;$(ProjectDir)MarchGL\include\ImGUI</AdditionalIncludeDirectories>
-      <EnableModules>true</EnableModules>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)MarchGL\include;$(ProjectDir)MarchGL\include\ImGUI;</AdditionalIncludeDirectories>
+      <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -96,11 +97,12 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)MarchGL\include;$(ProjectDir)MarchGL\include\ImGUI</AdditionalIncludeDirectories>
-      <EnableModules>true</EnableModules>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)MarchGL\include;$(ProjectDir)MarchGL\include\ImGUI;</AdditionalIncludeDirectories>
+      <EnableModules>false</EnableModules>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalOptions>/Zc:__cplusplus /std:c++20</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,14 +150,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\cparse\builtin-features.cpp" />
+    <ClCompile Include="include\cparse\containers.cpp" />
+    <ClCompile Include="include\cparse\functions.cpp" />
+    <ClCompile Include="include\cparse\packToken.cpp" />
+    <ClCompile Include="include\cparse\shunting-yard.cpp" />
     <ClCompile Include="src\cubeMarch.cpp" />
-    <ClCompile Include="src\imgui.cpp" />
-    <ClCompile Include="src\imgui_demo.cpp" />
-    <ClCompile Include="src\imgui_draw.cpp" />
-    <ClCompile Include="src\imgui_impl_glfw.cpp" />
-    <ClCompile Include="src\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="src\imgui_tables.cpp" />
-    <ClCompile Include="src\imgui_widgets.cpp" />
+    <ClCompile Include="include\ImGUI\imgui.cpp" />
+    <ClCompile Include="include\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="include\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="include\ImGUI\imgui_impl_glfw.cpp" />
+    <ClCompile Include="include\ImGUI\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="include\ImGUI\imgui_stdlib.cpp" />
+    <ClCompile Include="include\ImGUI\imgui_tables.cpp" />
+    <ClCompile Include="include\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="src\marchgl.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp">
@@ -164,29 +172,40 @@
     <ClCompile Include="src\squareMarch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="basicColorShader.fs" />
-    <None Include="basicColorShader.vs" />
     <None Include="res\shaders\shader_fs.glsl" />
     <None Include="res\shaders\shader_vs.glsl" />
-    <None Include="shaders\basicShader_fs.glsl" />
-    <None Include="shaders\basicShader_vs.glsl" />
+    <None Include="res\shaders\basicColorShader_fs.glsl" />
+    <None Include="res\shaders\basicColorShader_vs.glsl" />
+    <None Include="res\shaders\basicShader_fs.glsl" />
+    <None Include="res\shaders\basicShader_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
+    <ClInclude Include="include\cparse\builtin-features.h" />
+    <ClInclude Include="include\cparse\builtin-features\functions_inc.h" />
+    <ClInclude Include="include\cparse\builtin-features\operations_inc.h" />
+    <ClInclude Include="include\cparse\builtin-features\reservedWords_inc.h" />
+    <ClInclude Include="include\cparse\builtin-features\typeSpecificFunctions_inc.h" />
+    <ClInclude Include="include\cparse\containers.h" />
+    <ClInclude Include="include\cparse\functions.h" />
+    <ClInclude Include="include\cparse\packToken.h" />
+    <ClInclude Include="include\cparse\shunting-yard-exceptions.h" />
+    <ClInclude Include="include\cparse\shunting-yard.h" />
     <ClInclude Include="include\cubeMarch.h" />
     <ClInclude Include="include\filesys.hpp" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\glm\glm.hpp" />
-    <ClInclude Include="include\imconfig.h" />
-    <ClInclude Include="include\imgui.h" />
-    <ClInclude Include="include\imgui_impl_glfw.h" />
-    <ClInclude Include="include\imgui_impl_opengl3.h" />
-    <ClInclude Include="include\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="include\imgui_internal.h" />
+    <ClInclude Include="include\ImGUI\imconfig.h" />
+    <ClInclude Include="include\ImGUI\imgui.h" />
+    <ClInclude Include="include\ImGUI\imgui_impl_glfw.h" />
+    <ClInclude Include="include\ImGUI\imgui_impl_opengl3.h" />
+    <ClInclude Include="include\ImGUI\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="include\ImGUI\imgui_internal.h" />
+    <ClInclude Include="include\ImGUI\imgui_stdlib.h" />
     <ClInclude Include="include\implicit.h" />
-    <ClInclude Include="include\imstb_rectpack.h" />
-    <ClInclude Include="include\imstb_textedit.h" />
-    <ClInclude Include="include\imstb_truetype.h" />
+    <ClInclude Include="include\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="include\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="include\ImGUI\imstb_truetype.h" />
     <ClInclude Include="include\main.h" />
     <ClInclude Include="include\marchgl.h" />
     <ClInclude Include="include\marchingUtils.h" />
