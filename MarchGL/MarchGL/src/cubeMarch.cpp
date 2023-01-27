@@ -15,13 +15,34 @@ cubeMarch::cubeMarch(void) {
 	renderSettings.gridSize = glm::vec3(1.f);
 	renderSettings.renderMode = 0;
 	renderSettings.threadAmount = 1;
+
+	size = glm::ivec3(
+		renderSettings.gridSize.x * 2,
+		renderSettings.gridSize.y * 2,
+		renderSettings.gridSize.z * 2
+	);
+
+	std::cout << "LOADING CubeMarch SHADER: ... " << std::endl << std::endl;
+	shader = Shader("res/shaders/basicShader_vs.glsl", "res/shaders/basicShader_fs.glsl");
+	basicShader = Shader("res/shaders/basicColorShader_vs.glsl", "res/shaders/basicColorShader_fs.glsl");
+	if (!shader.wasSuccessful()) {
+		std::cout << "Shader was not successful" << std::endl;
+		std::cout << shader.getReport() << std::endl;
+		return;
+	} else
+		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
+
+	std::cout << "LOADING CubeMarch COMPUTE SHADER: ... " << std::endl << std::endl;
+	computeShader = ComputeShader("res/shaders/marchingcubes_cs.glsl");
+	if (!computeShader.wasSuccessful()) {
+		std::cout << "Shader was not successful" << std::endl;
+		std::cout << computeShader.getReport() << std::endl;
+		return;
+	} else
+		std::cout << std::endl << "[DONE]" << std::endl;
 }
 
 cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
-	cout << "\tInitializing CParse:";
-	cparse_startup();
-	cout << "\t[OK]\n" << endl;
-
 	renderSettings = rS;
 }
 
@@ -98,6 +119,7 @@ void cubeMarch::generateSingle(glm::vec3 currPoint) {
 	//std::cout << "[DONE]" << std::endl;
 }
 
+
 void cubeMarch::generateCPU(void) {
 	for (float x = -renderSettings.gridSize.x; x < renderSettings.gridSize.x; x += renderSettings.cubeSize)
 		for (float y = -renderSettings.gridSize.y; y < renderSettings.gridSize.y; y += renderSettings.cubeSize)
@@ -105,36 +127,41 @@ void cubeMarch::generateCPU(void) {
 				generateSingle(glm::vec3(x, y, z));
 }
 
+
 void cubeMarch::generateGPU(void) {
 	computeShader.recompileWithFunctions(iFunction);
 
-	glm::ivec3 size(
-		renderSettings.gridSize.x * 2,
-		renderSettings.gridSize.y * 2,
-		renderSettings.gridSize.z * 2
-	);
+	glm::ivec3 sizeGrid = ( renderSettings.gridSize * glm::vec3(2) ) / renderSettings.cubeSize;
+
+	GLuint meshBuffer, normalBuffer;
 
 	glGenBuffers(1, &meshBuffer);
 	glGenBuffers(1, &normalBuffer);
 
-	glGenVertexArrays(1, &computeVAO);
-	glBindVertexArray(computeVAO);
+	const int bufferSize = sizeGrid.x * sizeGrid.y * sizeGrid.z * 16;
 
+	glm::vec3* gMeshTriangles = new glm::vec3[bufferSize];
 	glBindBuffer(GL_ARRAY_BUFFER, meshBuffer);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(gMeshTriangles), NULL, GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, meshBuffer);
-	glBufferData(GL_ARRAY_BUFFER, size.x * size.y * size.z * 16 * sizeof(glm::vec3), &meshTriangles, GL_DYNAMIC_DRAW);
 
+
+	glm::vec3* gNormals = new glm::vec3[bufferSize];
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(gNormals), NULL, GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, normalBuffer);
-	glBufferData(GL_ARRAY_BUFFER, size.x * size.y * size.z * 16 * sizeof(glm::vec3), &normals, GL_DYNAMIC_DRAW);
 
-	glBindVertexArray(0);
+	//glBindVertexArray(0);
 
-	glm::ivec3 sizeGrid = ( renderSettings.gridSize * glm::vec3(2) ) / renderSettings.cubeSize;
+	for (size_t i = 0; i < bufferSize; i++) {
+		cout << gNormals[i].x << ", " << gNormals[i].y << ", " << gNormals[i].z << endl;
+		meshTriangles.push_back(gMeshTriangles[i]);
+		normals.push_back(gNormals[i]);
+	}
 
 	computeShader.use();
 	computeShader.setFloat("voxelSize", renderSettings.cubeSize);
@@ -144,35 +171,16 @@ void cubeMarch::generateGPU(void) {
 
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, meshBuffer);
-	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size.x * size.y * size.z * 16 * sizeof(glm::vec3), &meshTriangles);
-
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, normalBuffer);
-	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 1, size.x * size.y * size.z * 16 * sizeof(glm::vec3), &normals);
+	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize * sizeof(glm::vec3), &gNormals);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, meshBuffer);
+	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize * sizeof(glm::vec3), &gMeshTriangles);
 }
 
 void cubeMarch::generate(void) {
 	if (iFunction == "")
 		return;
-
-	std::cout << "LOADING CubeMarch SHADER: ... " << std::endl << std::endl;
-	shader = Shader("res/shaders/basicShader_vs.glsl", "res/shaders/basicShader_fs.glsl");
-	basicShader = Shader("res/shaders/basicColorShader_vs.glsl", "res/shaders/basicColorShader_fs.glsl");
-	if (!shader.wasSuccessful()) {
-		std::cout << "Shader was not successful" << std::endl;
-		std::cout << shader.getReport() << std::endl;
-		return;
-	} else
-		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
-
-	std::cout << "LOADING CubeMarch COMPUTE SHADER: ... " << std::endl << std::endl;
-	computeShader = ComputeShader("res/shaders/marchingcubes_cs.glsl");
-	if (!computeShader.wasSuccessful()) {
-		std::cout << "Shader was not successful" << std::endl;
-		std::cout << computeShader.getReport() << std::endl;
-		return;
-	} else
-		std::cout << std::endl << "[DONE]" << std::endl;
 
 	meshTriangles.clear();
 	normals.clear();
@@ -296,69 +304,6 @@ glm::vec3 cubeMarch::getIntersVertice(glm::vec3 p1, glm::vec3 p2, float D1, floa
 
 	return ( 1 - t ) * p1 + t * p2;
 }
-
-//marching cubes without isovalues
-//void cubeMarch::marchingCubesSimple() {
-//	std::cout << "Marching Cubes Simple: ... ";
-//
-//	for (int i = 0; i < voxels.size(); i++) {
-//		//check what vertice is inside the sphere
-//		string bin = "00000000";
-//		float densities[8]; //density of every vertice
-//
-//		//for every vertice
-//		for (int d = 0; d < 8; d++) {
-//			densities[d] = getDensity(voxels[i].p[d]); //get the density of the vertice
-//			if (densities[d] < 0) bin[7 - d] = '1'; //check if the vertice is in the surface
-//		}
-//
-//
-//		//cube either doesn't have any vertice in the shape, or as all of them
-//		if (bin == "00000000" || bin == "11111111")
-//			continue;
-//
-//		//case number (conversion from binary to decimal)
-//		int case_n = std::stoi(bin, 0, 2);
-//
-//		//edges that intersects the isosurface (binary)
-//		int edgesInters = tbl::edgeTable[case_n];
-//
-//		//get all the vertices for the triangles
-//		glm::vec3 vertices[12];
-//
-//		//no edges intersect the isosurface
-//		if (edgesInters == 0)
-//			continue;
-//
-//		// (edgesInters & 1) -> verifies if the the right most bit of edgesInters is 1
-//		// this allows to check if the edge 0 is in the edges intersected by the implicit function
-//		// f.e: edgesInters = 0011 -> true
-//		//      edgesInters = 0100 -> false
-//		if (edgesInters & 1) vertices[0] = ( getIntersVertice(voxels[i].p[0], voxels[i].p[1], densities[0], densities[1]) ); //edge 0
-//		if (edgesInters & 2) vertices[1] = ( getIntersVertice(voxels[i].p[1], voxels[i].p[2], densities[1], densities[2]) ); //edge 1
-//		if (edgesInters & 4) vertices[2] = ( getIntersVertice(voxels[i].p[2], voxels[i].p[3], densities[2], densities[3]) ); //edge 2
-//		if (edgesInters & 8) vertices[3] = ( getIntersVertice(voxels[i].p[3], voxels[i].p[0], densities[3], densities[0]) ); //edge 3 
-//		if (edgesInters & 16) vertices[4] = ( getIntersVertice(voxels[i].p[4], voxels[i].p[5], densities[4], densities[5]) ); //edge 4
-//		if (edgesInters & 32) vertices[5] = ( getIntersVertice(voxels[i].p[5], voxels[i].p[6], densities[5], densities[6]) ); //edge 5
-//		if (edgesInters & 64) vertices[6] = ( getIntersVertice(voxels[i].p[6], voxels[i].p[7], densities[6], densities[7]) ); //edge 6
-//		if (edgesInters & 128) vertices[7] = ( getIntersVertice(voxels[i].p[7], voxels[i].p[4], densities[7], densities[4]) ); //edge 7
-//		if (edgesInters & 256) vertices[8] = ( getIntersVertice(voxels[i].p[0], voxels[i].p[4], densities[0], densities[4]) ); //edge 8
-//		if (edgesInters & 512) vertices[9] = ( getIntersVertice(voxels[i].p[1], voxels[i].p[5], densities[1], densities[5]) ); //edge 9
-//		if (edgesInters & 1024) vertices[10] = ( getIntersVertice(voxels[i].p[2], voxels[i].p[6], densities[2], densities[6]) ); //edge 10
-//		if (edgesInters & 2048) vertices[11] = ( getIntersVertice(voxels[i].p[3], voxels[i].p[7], densities[3], densities[7]) ); //edge 11
-//
-//
-//		// Adds the triangles vertices in the correct order to the meshTriangles list
-//		for (int n = 0; tbl::triTable[case_n][n] != -1; n += 3) {
-//			meshTriangles.push_back(vertices[tbl::triTable[case_n][n]]);
-//			meshTriangles.push_back(vertices[tbl::triTable[case_n][n + 1]]);
-//			meshTriangles.push_back(vertices[tbl::triTable[case_n][n + 2]]);
-//		}
-//
-//	}
-//
-//	std::cout << "[DONE]" << std::endl;
-//}
 
 //----mesh----
 void cubeMarch::createMesh() {

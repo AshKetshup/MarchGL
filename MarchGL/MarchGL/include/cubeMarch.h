@@ -38,10 +38,10 @@ class cubeMarch {
 	unsigned VAO, meshVAO, gridVAO, gridLinesVAO;
 	RENDER_SETTINGS renderSettings;
 	string iFunction;
+	glm::ivec3 size;
 
 	int width, height = 0;
 
-	unsigned meshBuffer, normalBuffer;
 	unsigned computeVAO;
 
 	public:
@@ -65,7 +65,7 @@ class cubeMarch {
 	void generate(void);
 
 	//---- Mesh ----
-	void createMesh();
+	void createMesh(void);
 	void drawMesh(Camera camera, glm::vec3 trans, SHADER_SETTINGS& settings);
 
 	//---- Grid ----
