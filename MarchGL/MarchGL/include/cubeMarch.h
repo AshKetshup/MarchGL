@@ -1,7 +1,7 @@
 #ifndef CUBEMARCH_H
 #define CUBEMARCH_H
 
-#include <shader_m.h>
+#include <computeshader.h>
 #include <camera.h>
 
 #include "marchingutils.h"
@@ -31,6 +31,7 @@ typedef struct {
 
 class cubeMarch {
 	private:
+	ComputeShader computeShader;					// Compute Shader
 	Shader basicShader;								// Grid shader
 	Shader shader;									// Mesh shader
 	std::vector<glm::vec3> meshTriangles, normals;	// vertices for the triangles (mesh)
@@ -39,6 +40,9 @@ class cubeMarch {
 	string iFunction;
 
 	int width, height = 0;
+
+	unsigned meshBuffer, normalBuffer;
+	unsigned computeVAO;
 
 	public:
 	cubeMarch(void);
@@ -56,6 +60,8 @@ class cubeMarch {
 	 */
 	glm::vec3 getIntersVertice(glm::vec3 p1, glm::vec3 p2, float D1, float D2);
 	void generateSingle(glm::vec3 currPoint);
+	void generateCPU(void);
+	void generateGPU(void);
 	void generate(void);
 
 	//---- Mesh ----

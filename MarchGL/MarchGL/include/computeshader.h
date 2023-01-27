@@ -31,12 +31,21 @@ class ComputeShader {
 		return true;
 	}
 
+	string formatGLSL(string GLSLCode, string iFunction) {
+		regex regexIFunction = regex("// <IFunction>");
+
+		string GLSLFormatted = "return " + iFunction + ";\n";
+		string GLSLFCode = regex_replace(GLSLCode, regexIFunction, GLSLFormatted);
+
+		return GLSLFCode;
+	}
+
 	public:
 	unsigned int ID;
 	ComputeShader(void) { }
 	// Constructor generates the compute shader on the fly
 	// ------------------------------------------------------------------------
-	ComputeShader(const char* computePath) {
+	ComputeShader(const char* computePath, string iFunction = "") {
 		// 0. Define the path of the shader
 		report = ShaderReport();
 		computeShader = string(computePath);
@@ -55,6 +64,10 @@ class ComputeShader {
 		} catch (ifstream::failure& e) {
 			report.setReport(TYPE_READING | SHADER_COMPUTE, string(e.what()));
 			return;
+		}
+
+		if (iFunction != "") {
+			computeCode = formatGLSL(computeCode, iFunction);
 		}
 
 		const char* cShaderCode = computeCode.c_str();
@@ -78,10 +91,77 @@ class ComputeShader {
 		glDeleteShader(compute);
 	}
 
+	void recompileWithFunctions(string iFunction) {
+		// 1. retrieve the compute source code from filePath
+		string computeCode = this->computeShader;
+		ifstream cShaderFile;
+
+		// ensure ifstream objects can throw exceptions
+		cShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+
+		try {
+			cShaderFile.open(computeShader);
+			stringstream cShaderStream;
+			cShaderStream << cShaderFile.rdbuf();
+			cShaderFile.close();
+			computeCode = cShaderStream.str();
+		} catch (ifstream::failure& e) {
+			report.setReport(TYPE_READING | SHADER_COMPUTE, string(e.what()));
+			return;
+		}
+
+		if (iFunction != "") {
+			computeCode = formatGLSL(computeCode, iFunction);
+		}
+
+		const char* cShaderCode = computeCode.c_str();
+
+		cout << "__COMPUTE SHADER__" << endl << cShaderCode << endl;
+
+		// 2. Compile Shader
+		unsigned int compute;
+
+		// compute shader
+		compute = glCreateShader(GL_COMPUTE_SHADER);
+		glShaderSource(compute, 1, &cShaderCode, NULL);
+		glCompileShader(compute);
+		if (!checkCompileErrors(compute, SHADER_COMPUTE)) return;
+
+		// Count linked shaders and unlink them
+		GLsizei count;
+		GLuint* shader = (GLuint*) malloc(sizeof(GLuint));
+
+		glGetAttachedShaders(this->ID, 1, &count, shader);
+		for (GLsizei i = 0; i < count; i++) {
+			glDetachShader(this->ID, shader[i]);
+			glDeleteShader(shader[i]);
+		}
+
+		free(shader);
+		glDeleteProgram(this->ID);
+
+		// Shader Program
+		this->ID = glCreateProgram();
+
+		glAttachShader(ID, compute);
+		glLinkProgram(ID);
+		if (!checkCompileErrors(ID, SHADER_PROGRAM))
+			return;
+
+		// Delete the shaders as they're linked into our program now and no longer necessery
+		glDeleteShader(compute);
+	}
+
 	// activate the shader
 	// ------------------------------------------------------------------------
 	void use() {
 		glUseProgram(ID);
+	}
+	// dispatch the shader
+	// ------------------------------------------------------------------------
+	void execute(GLuint numGroupsX = 1, GLuint numGroupsY = 1, GLuint numGroupsZ = 1) const {
+		glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ);
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	}
 	// utility uniform functions
 	// ------------------------------------------------------------------------

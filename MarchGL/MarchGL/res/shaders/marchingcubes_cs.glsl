@@ -307,6 +307,133 @@ int triTable[256][16] = {
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
 
+struct VOXEL {
+	vec3 p;
+	float val;
+};
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 1) buffer _meshTriangles {
+	vec3 meshTriangles[];
+};
+
+layout(std430, binding = 2) buffer _normals {
+	vec3 normals[];
+};
+
+uniform float voxelSize;
+uniform ivec3 gridSize;
+
+ivec3 voxelAmounts = ivec3(gridSize/voxelSize);
+
+vec3 getIntersVertice(vec3 p1, vec3 p2, float D1, float D2) {
+	if (abs(D1) < 0.00001)
+		return p1;
+
+	if (abs(D2) < 0.00001)
+		return p2;
+
+	if (abs(D1 - D2) < 0.00001)
+		return p1;
+
+	float t = -D1 / ( D2 - D1 );
+
+	return ( 1 - t ) * p1 + t * p2;
+}
+
+float getDensity(vec3 p) {
+	float x, y, z;
+	x = p.x;
+	y = p.y;
+	z = p.z;
+
+	// <IFunction>
+
+	return 1.f;
+}
+
+void generateSingle(ivec3 currPoint) {
+	vec3 point = currPoint * voxelSize;
+
+	VOXEL voxel[8];
+	int bin = 0;
+	
+	for (int i = 0; i < 8; i++) {
+		voxel[i].p = vec3(
+			point.x + voxelSize * vertexOffset[i][0],
+			point.y + voxelSize * vertexOffset[i][1],
+			point.z + voxelSize * vertexOffset[i][2]
+		);
+
+		voxel[i].val = getDensity(voxel[i].p);
+		if (voxel[i].val < 0)
+			bin |= 1 << i;
+	}
+
+	if (bin == 0 || bin == 255)
+		return;
+
+	int edgeFlag = edgeTable[bin];
+
+	vec3 edgeVertices[12];
+	if (bool(edgeFlag & 1)) edgeVertices[0] = getIntersVertice(voxel[0].p, voxel[1].p, voxel[0].val, voxel[1].val); //edge 0
+	if (bool(edgeFlag & 2)) edgeVertices[1] = getIntersVertice(voxel[1].p, voxel[2].p, voxel[1].val, voxel[2].val); //edge 1
+	if (bool(edgeFlag & 4)) edgeVertices[2] = getIntersVertice(voxel[2].p, voxel[3].p, voxel[2].val, voxel[3].val); //edge 2
+	if (bool(edgeFlag & 8)) edgeVertices[3] = getIntersVertice(voxel[3].p, voxel[0].p, voxel[3].val, voxel[0].val); //edge 3 
+	if (bool(edgeFlag & 16)) edgeVertices[4] = getIntersVertice(voxel[4].p, voxel[5].p, voxel[4].val, voxel[5].val); //edge 4
+	if (bool(edgeFlag & 32)) edgeVertices[5] = getIntersVertice(voxel[5].p, voxel[6].p, voxel[5].val, voxel[6].val); //edge 5
+	if (bool(edgeFlag & 64)) edgeVertices[6] = getIntersVertice(voxel[6].p, voxel[7].p, voxel[6].val, voxel[7].val); //edge 6
+	if (bool(edgeFlag & 128)) edgeVertices[7] = getIntersVertice(voxel[7].p, voxel[4].p, voxel[7].val, voxel[4].val); //edge 7
+	if (bool(edgeFlag & 256)) edgeVertices[8] = getIntersVertice(voxel[0].p, voxel[4].p, voxel[0].val, voxel[4].val); //edge 8
+	if (bool(edgeFlag & 512)) edgeVertices[9] = getIntersVertice(voxel[1].p, voxel[5].p, voxel[1].val, voxel[5].val); //edge 9
+	if (bool(edgeFlag & 1024)) edgeVertices[10] = getIntersVertice(voxel[2].p, voxel[6].p, voxel[2].val, voxel[6].val); //edge 10
+	if (bool(edgeFlag & 2048)) edgeVertices[11] = getIntersVertice(voxel[3].p, voxel[7].p, voxel[3].val, voxel[7].val); //edge 11
+
+	for (int n = 0; triTable[bin][n] != -1; n += 3) {
+		vec3 a, b, c, normal;
+
+		a = edgeVertices[triTable[bin][n]];
+		b = edgeVertices[triTable[bin][n + 1]];
+		c = edgeVertices[triTable[bin][n + 2]];
+
+		meshTriangles[(n) * voxelAmounts.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.x
+		] = a;
+		meshTriangles[(n+1) * voxelAmounts.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.x
+		] = b;
+		meshTriangles[(n+2) * voxelAmounts.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.x
+		] = c;
+
+		normal = -normalize(cross(b - a, c - a));
+
+		normals[(n) * voxelAmounts.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.x
+		] = normal;
+		normals[(n+1) * voxelAmounts.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.x
+		] = normal;
+		normals[(n+2) * voxelAmounts.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.z * voxelAmounts.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.y * voxelAmounts.x + 
+			gl_GlobalInvocationID.x
+		] = normal;
+	}
+}
+
 void main() {
-    
+    ivec3 cellIndex = ivec3(gl_GlobalInvocationID.xyz);
+	generateSingle(cellIndex - (gridSize / 2));
 }

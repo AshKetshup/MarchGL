@@ -376,7 +376,8 @@ void MarchGL::renderUI(void) {
 	{
 		ImGui::Begin("Implicit Functions");
 
-		ImGui::InputText("Function (f = 0)", &iF.function);
+		ImGui::Text("Function (f = 0)");
+		ImGui::InputText(" ", &iF.function);
 
 		if (ImGui::Button("Render")) {
 			marchingCubes->setIFunction(iF);

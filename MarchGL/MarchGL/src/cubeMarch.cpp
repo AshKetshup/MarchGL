@@ -98,6 +98,59 @@ void cubeMarch::generateSingle(glm::vec3 currPoint) {
 	//std::cout << "[DONE]" << std::endl;
 }
 
+void cubeMarch::generateCPU(void) {
+	for (float x = -renderSettings.gridSize.x; x < renderSettings.gridSize.x; x += renderSettings.cubeSize)
+		for (float y = -renderSettings.gridSize.y; y < renderSettings.gridSize.y; y += renderSettings.cubeSize)
+			for (float z = -renderSettings.gridSize.z; z < renderSettings.gridSize.z; z += renderSettings.cubeSize)
+				generateSingle(glm::vec3(x, y, z));
+}
+
+void cubeMarch::generateGPU(void) {
+	computeShader.recompileWithFunctions(iFunction);
+
+	glm::ivec3 size(
+		renderSettings.gridSize.x * 2,
+		renderSettings.gridSize.y * 2,
+		renderSettings.gridSize.z * 2
+	);
+
+	glGenBuffers(1, &meshBuffer);
+	glGenBuffers(1, &normalBuffer);
+
+	glGenVertexArrays(1, &computeVAO);
+	glBindVertexArray(computeVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, meshBuffer);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, meshBuffer);
+	glBufferData(GL_ARRAY_BUFFER, size.x * size.y * size.z * 16 * sizeof(glm::vec3), &meshTriangles, GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, normalBuffer);
+	glBufferData(GL_ARRAY_BUFFER, size.x * size.y * size.z * 16 * sizeof(glm::vec3), &normals, GL_DYNAMIC_DRAW);
+
+	glBindVertexArray(0);
+
+	glm::ivec3 sizeGrid = ( renderSettings.gridSize * glm::vec3(2) ) / renderSettings.cubeSize;
+
+	computeShader.use();
+	computeShader.setFloat("voxelSize", renderSettings.cubeSize);
+	computeShader.setVec3("gridSize", sizeGrid);
+
+	computeShader.execute(sizeGrid.x, sizeGrid.y, sizeGrid.z);
+
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, meshBuffer);
+	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size.x * size.y * size.z * 16 * sizeof(glm::vec3), &meshTriangles);
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, normalBuffer);
+	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 1, size.x * size.y * size.z * 16 * sizeof(glm::vec3), &normals);
+}
+
 void cubeMarch::generate(void) {
 	if (iFunction == "")
 		return;
@@ -108,6 +161,16 @@ void cubeMarch::generate(void) {
 	if (!shader.wasSuccessful()) {
 		std::cout << "Shader was not successful" << std::endl;
 		std::cout << shader.getReport() << std::endl;
+		return;
+	} else
+		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
+
+	std::cout << "LOADING CubeMarch COMPUTE SHADER: ... " << std::endl << std::endl;
+	computeShader = ComputeShader("res/shaders/marchingcubes_cs.glsl");
+	if (!computeShader.wasSuccessful()) {
+		std::cout << "Shader was not successful" << std::endl;
+		std::cout << computeShader.getReport() << std::endl;
+		return;
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl;
 
@@ -115,11 +178,11 @@ void cubeMarch::generate(void) {
 	normals.clear();
 
 	std::cout << "Running Marching Cube" << std::endl;
-	for (float x = -renderSettings.gridSize.x; x < renderSettings.gridSize.x; x += renderSettings.cubeSize)
-		for (float y = -renderSettings.gridSize.y; y < renderSettings.gridSize.y; y += renderSettings.cubeSize)
-			for (float z = -renderSettings.gridSize.z; z < renderSettings.gridSize.z; z += renderSettings.cubeSize)
-				generateSingle(glm::vec3(x, y, z));
-	std::cout << std::endl << "[DONE]" << std::endl;
+	( renderSettings.renderMode == 0 )
+		? generateCPU()
+		: generateGPU()
+		;
+	std::cout << std::endl << "[DONE]" << std::endl << std::endl;
 
 	createMesh();
 }
@@ -128,6 +191,7 @@ void cubeMarch::setIFunction(IMPLICIT_FUNCTION& iF) {
 	iFunction = iF.function;
 }
 
+#pragma region Grid
 //----grid----
 //void cubeMarch::createGrid() {
 //	std::cout << "Create Grid: ... " << std::endl;
@@ -193,27 +257,12 @@ void cubeMarch::setIFunction(IMPLICIT_FUNCTION& iF) {
 //	glPointSize(5.0);
 //	glDrawArrays(GL_POINTS, 0, gridPoints);
 //}
-
-
+#pragma endregion
 
 //-----marching cubes algorithm-----
 
-
 //returns the density of the point p
 float cubeMarch::getDensity(glm::vec3 p) {
-	// if (obj == "torus") {
-	//    //x = (R1 + R2*cos(v)) * cos(u)
-	//    //y = (R1 + R2*cos(v)) * sin(u)
-	//    //z = R2 * sin(v)
-	//    //(sqrt(x^2+y^2) - R)^2 + z^2 = r^2
-
-	//    return ( pow(sqrt(p.x * p.x + p.y * p.y) - R1, 2) + p.z * p.z - R2 * R2 );
-	// }
-
-	// //----default----
-	// //x^2 + y^2 + z^2 = r^2 (sphere)
-	// return ( p.x * p.x + p.y * p.y + p.z * p.z - radius * radius );
-
 	double result = 0.f;
 	TokenMap vars;
 
@@ -245,13 +294,6 @@ glm::vec3 cubeMarch::getIntersVertice(glm::vec3 p1, glm::vec3 p2, float D1, floa
 
 	float t = -D1 / ( D2 - D1 );
 
-	/*if (tmp.z > radius) {
-		std::cout << "----------------------" << std::endl;
-		std::cout << "p1: " << p1.x << ", " << p1.y << ", " << p1.z << std::endl;
-		std::cout << "p2: " << p2.x << ", " << p2.y << ", " << p2.z << std::endl;
-		std::cout << "----------------------" << std::endl;
-	}*/
-	//return (p1 + p2) / 2.0f;
 	return ( 1 - t ) * p1 + t * p2;
 }
 
