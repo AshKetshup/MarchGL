@@ -172,6 +172,7 @@
     <ClCompile Include="src\squareMarch.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\computeShader.cs" />
     <None Include="res\shaders\computeShaderOriginal.cs" />
     <None Include="res\shaders\marchingcubes_cs.glsl" />
     <None Include="res\shaders\shader_fs.glsl" />

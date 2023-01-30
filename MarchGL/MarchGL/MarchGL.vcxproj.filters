@@ -88,6 +88,9 @@
     <None Include="res\shaders\computeShaderOriginal.cs">
       <Filter>shaders</Filter>
     </None>
+    <None Include="res\shaders\computeShader.cs">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\filesys.hpp">

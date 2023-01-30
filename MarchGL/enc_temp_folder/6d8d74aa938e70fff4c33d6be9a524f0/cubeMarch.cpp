@@ -372,7 +372,7 @@ void cubeMarch::generateGPU() {
 
 
 	cout << "Starting compute shader" << endl;
-	cout << "Total size " << sizeGrid.x * sizeGrid.y * sizeGrid.z << endl;
+	cout << "Total size" << sizeGrid.x * sizeGrid.y * sizeGrid.z << endl;
 	cout << "Sizes: " << sizeGrid.x <<" " << sizeGrid.y << " "<< sizeGrid.z << endl;
 	//compute shader
 	computeShader.use();

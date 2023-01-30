@@ -2,6 +2,7 @@
 
 
 
+
 struct TRIANGLES
 {
     vec4 p[12];
@@ -26,11 +27,20 @@ layout(std430, binding = 2) buffer Input3
 ;
 
 
-layout(std430, binding = 3) buffer Output
+layout(std140, binding = 3) buffer Output
 {
-    TRIANGLES allTriangles[44][64][67]; //change after !!!!!!!!!!!!!!!!!!
+    TRIANGLES allTriangles[20][20][20]; //change after !!!!!!!!!!!!!!!!!!
 }
 ;
+
+layout(std140, binding = 4) buffer OutputNormals
+{
+    TRIANGLES allNormals [20]
+    [20]
+    [20]; //change after !!!!!!!!!!!!!!!!!!
+}
+;
+
 
 
 //float dist = 1.0f;
@@ -75,7 +85,7 @@ float getDensity(float x, float y, float z)
 {
     //if (obj == 0) return p.x * p.x + p.y * p.y + p.z * p.z - radius * radius;
     //else return ((sqrt(p.x * p.x + p.y * p.y) - radius) * (sqrt(p.x * p.x + p.y * p.y) - radius) + p.z * p.z - (radius / 2) * (radius / 2));
-    return (sqrt(x*x+y*y)-1.0f)*(sqrt(x*x+y*y)-1.0f)+z*z-0.5*0.5;
+    return x*x+y*y+z*z-1;
 }
 
 void main()
@@ -161,6 +171,21 @@ void main()
             allTriangles[index_x][index_y][index_z].p[n] = edgeVertices[triTable[bin_int][n]];
             allTriangles[index_x][index_y][index_z].p[n + 1] = edgeVertices[triTable[bin_int][n + 1]];
             allTriangles[index_x][index_y][index_z].p[n + 2] = edgeVertices[triTable[bin_int][n + 2]];
+
+
+            //normalization
+            vec3 a = vec3(allTriangles[index_x][index_y][index_z].p[n].x, allTriangles[index_x][index_y][index_z].p[n].y, allTriangles[index_x][index_y][index_z].p[n].z);
+            vec3 b = vec3(allTriangles[index_x][index_y][index_z].p[n + 1].x, allTriangles[index_x][index_y][index_z].p[n + 1].y, allTriangles[index_x][index_y][index_z].p[n + 1].z);
+            vec3 c = vec3(allTriangles[index_x][index_y][index_z].p[n + 2].x, allTriangles[index_x][index_y][index_z].p[n + 2].y, allTriangles[index_x][index_y][index_z].p[n + 2].z);
+
+
+            vec3 normal = -normalize(cross(b-a,c-a));
+            
+            allNormals[index_x][index_y][index_z].p[n] = vec4(normal, 0.0f);
+            allNormals[index_x][index_y][index_z].p[n + 1] = vec4(normal, 0.0f);
+            allNormals[index_x][index_y][index_z].p[n + 2] = vec4(normal, 0.0f);
+
+
         }
         
     }
