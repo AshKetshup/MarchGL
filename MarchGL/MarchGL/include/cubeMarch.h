@@ -1,10 +1,13 @@
 #ifndef CUBEMARCH_H
 #define CUBEMARCH_H
 
-#include <computeshader.h>
+#include <shader_c.h>
+#include <shader_m.h>
 #include <camera.h>
 
 #include "marchingutils.h"
+using namespace std;
+
 
 typedef struct {
 	glm::vec3 p;
@@ -35,7 +38,7 @@ typedef struct {
 
 class cubeMarch {
 	private:
-	ComputeShader computeShader;					// Compute Shader
+	//ComputeShader computeShader;					// Compute Shader
 	Shader basicShader;								// Grid shader
 	Shader shader;									// Mesh shader
 	std::vector<glm::vec3> meshTriangles, normals;	// vertices for the triangles (mesh)

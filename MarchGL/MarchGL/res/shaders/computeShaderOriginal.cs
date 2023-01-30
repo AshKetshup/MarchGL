@@ -140,11 +140,13 @@ void main()
 
     int edgeFlag = edgeTable[bin_int];
     vec4 edgeVertices[12];
+    /*
     for (int i = 0; i < 12; i++)
     {
         //edgeVertices[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
         allTriangles[index_x][index_y][index_z].p[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
     }
+    */
    
     if (edgeFlag != 0)
     {

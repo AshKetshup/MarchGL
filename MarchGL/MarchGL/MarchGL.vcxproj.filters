@@ -198,6 +198,9 @@
     <ClInclude Include="include\computeshader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\shader_c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

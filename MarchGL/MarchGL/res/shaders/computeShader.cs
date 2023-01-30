@@ -29,15 +29,15 @@ layout(std430, binding = 2) buffer Input3
 
 layout(std140, binding = 3) buffer Output
 {
-    TRIANGLES allTriangles[20][20][20]; //change after !!!!!!!!!!!!!!!!!!
+    TRIANGLES allTriangles[40][40][60]; //change after !!!!!!!!!!!!!!!!!!
 }
 ;
 
 layout(std140, binding = 4) buffer OutputNormals
 {
-    TRIANGLES allNormals [20]
-    [20]
-    [20]; //change after !!!!!!!!!!!!!!!!!!
+    TRIANGLES allNormals [40]
+    [40]
+    [60]; //change after !!!!!!!!!!!!!!!!!!
 }
 ;
 
@@ -140,11 +140,13 @@ void main()
 
     int edgeFlag = edgeTable[bin_int];
     vec4 edgeVertices[12];
+    /*
     for (int i = 0; i < 12; i++)
     {
         //edgeVertices[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
         allTriangles[index_x][index_y][index_z].p[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
     }
+    */
    
     if (edgeFlag != 0)
     {

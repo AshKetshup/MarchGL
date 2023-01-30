@@ -6,6 +6,7 @@
 #include <random>
 #include <glm/gtx/normal.hpp>
 
+
 cubeMarch::cubeMarch(void) {
 	cout << "\tInitializing CParse:";
 	cparse_startup();
@@ -32,6 +33,7 @@ cubeMarch::cubeMarch(void) {
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
 
+	/*
 	std::cout << "LOADING CubeMarch COMPUTE SHADER: ... " << std::endl << std::endl;
 	computeShader = ComputeShader("res/shaders/marchingcubes_cs.glsl");
 	if (!computeShader.wasSuccessful()) {
@@ -40,6 +42,7 @@ cubeMarch::cubeMarch(void) {
 		return;
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl;
+		*/
 }
 
 cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
@@ -62,6 +65,7 @@ cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
 		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
 
 	std::cout << "LOADING CubeMarch COMPUTE SHADER: ... " << std::endl << std::endl;
+	/*
 	computeShader = ComputeShader("res/shaders/marchingcubes_cs.glsl");
 	if (!computeShader.wasSuccessful()) {
 		std::cout << "Shader was not successful" << std::endl;
@@ -70,12 +74,20 @@ cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
 	}
 	else
 		std::cout << std::endl << "[DONE]" << std::endl;
+	*/
 
 
 
+	
+	
+	
+	rS.gridSize.x = (float)((int)(rS.gridSize.x));
+	rS.gridSize.y = (float)((int)(rS.gridSize.y));
+	rS.gridSize.z = (float)((int)(rS.gridSize.z));
 
 	totalVertices = 0;
 	renderSettings = rS;
+
 	cout << "ALL SETTINGS" << endl;
 	cout << "Cube Size: " << renderSettings.cubeSize << endl;
 	cout << "Grid Size: " << renderSettings.gridSize.x << " " << renderSettings.gridSize.y << " " << renderSettings.gridSize.z << endl;
@@ -312,7 +324,7 @@ void cubeMarch::generateGPU() {
 	
 	//compile the CS
 	ComputeShader computeShader("res/shaders/computeShader.cs");
-
+	cout << "Compiled with sucess" << endl;
 	//computation sizes
 	int maxWorkGroupSize[3], workGroupCounts[3], workGroupInvocations[3];
 	//limit for the local size (inside the shader)
@@ -326,8 +338,8 @@ void cubeMarch::generateGPU() {
 	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &workGroupCounts[2]);
 
 
-	printf("MAXIMUM WORK GROUP SIZE: %d %d %d\n", maxWorkGroupSize[0], maxWorkGroupSize[1], maxWorkGroupSize[2]);
-	printf("MAXIMUM WORK GROUP COUNT: %d %d %d\n", workGroupCounts[0], workGroupCounts[1], workGroupCounts[2]);
+	//printf("MAXIMUM WORK GROUP SIZE: %d %d %d\n", maxWorkGroupSize[0], maxWorkGroupSize[1], maxWorkGroupSize[2]);
+	//printf("MAXIMUM WORK GROUP COUNT: %d %d %d\n", workGroupCounts[0], workGroupCounts[1], workGroupCounts[2]);
 
 
 	if (sizeGrid.x > workGroupCounts[0] || sizeGrid.y > workGroupCounts[1] || sizeGrid.z > workGroupCounts[2]) {

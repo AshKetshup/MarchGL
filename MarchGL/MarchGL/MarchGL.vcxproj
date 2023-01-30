@@ -213,6 +213,7 @@
     <ClInclude Include="include\main.h" />
     <ClInclude Include="include\marchgl.h" />
     <ClInclude Include="include\marchingUtils.h" />
+    <ClInclude Include="include\shader_c.h" />
     <ClInclude Include="include\shader_m.h" />
     <ClInclude Include="include\squareMarch.h" />
     <ClInclude Include="include\stb_image.h" />
