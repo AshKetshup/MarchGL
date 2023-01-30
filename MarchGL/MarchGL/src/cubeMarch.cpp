@@ -232,7 +232,7 @@ void cubeMarch::generateGPU(void) {
 
 
 //change the parameters in the compute shader
-bool cubeMarch::changeComputeShader(glm::ivec3 sizes, string iFunction) {
+bool cubeMarch::changeComputeShader(glm::ivec3 sizes, string iFunction, int localSizes[3]) {
 	// File to be read
 	string fileName = "res/shaders/computeShaderOriginal.cs";
 
@@ -291,6 +291,30 @@ bool cubeMarch::changeComputeShader(glm::ivec3 sizes, string iFunction) {
 		pos += iFunction.size();
 	}
 
+	pos = 0;
+	oldString = "localSize_x";
+	newString = std::to_string(localSizes[0]);
+	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
+		fileContents.replace(pos, oldString.length(), newString);
+		pos += newString.size();
+	}
+
+	pos = 0;
+	oldString = "localSize_y";
+	newString = std::to_string(localSizes[1]);
+	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
+		fileContents.replace(pos, oldString.length(), newString);
+		pos += newString.size();
+	}
+
+	pos = 0;
+	oldString = "localSize_z";
+	newString = std::to_string(localSizes[2]);
+	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
+		fileContents.replace(pos, oldString.length(), newString);
+		pos += newString.size();
+	}
+
 	
 
 
@@ -320,7 +344,12 @@ void cubeMarch::generateGPU() {
 	glm::ivec3 sizeGrid = (renderSettings.gridSize * glm::vec3(2)) / renderSettings.cubeSize;
 	cout << "Going to change the CS" << endl;
 	cout << "iFunction: " << iFunction << endl;
-	changeComputeShader(sizeGrid, iFunction);
+	int localSizes[] = { 50, 50, 50 };
+	if (sizeGrid.x < 50) localSizes[0] = 1;
+	if (sizeGrid.y < 50) localSizes[1] = 1;
+	if (sizeGrid.z < 50) localSizes[2] = 1;
+	changeComputeShader(sizeGrid, iFunction, localSizes);
+	int globalSizes[] = { sizeGrid.x / localSizes[0],sizeGrid.y / localSizes[1], sizeGrid.z / localSizes[2] };
 	
 	//compile the CS
 	ComputeShader computeShader("res/shaders/computeShader.cs");
@@ -391,12 +420,18 @@ void cubeMarch::generateGPU() {
 	computeShader.setFloat("dist", renderSettings.cubeSize);
 	//computeShader.setFloat("radius", 1.0f);
 	//computeShader.setInt("obj", 0);
-	computeShader.setFloat("x_size", renderSettings.gridSize.x);
-	computeShader.setFloat("y_size", renderSettings.gridSize.y);
-	computeShader.setFloat("z_size", renderSettings.gridSize.z);
-	glDispatchCompute(sizeGrid.x / 10, sizeGrid.y / 10, sizeGrid.y / 10);
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	computeShader.setInt("x_size", (int)(renderSettings.gridSize.x));
+	computeShader.setInt("y_size", (int)(renderSettings.gridSize.y));
+	computeShader.setInt("z_size", (int)(renderSettings.gridSize.z));
 
+	computeShader.setInt("MX", sizeGrid.x);
+	computeShader.setInt("MY", sizeGrid.y);
+	computeShader.setInt("MZ", sizeGrid.z);
+	cout << "Global sizes: " << globalSizes[0] << " " << globalSizes[1] << " " << globalSizes[2] << " " << endl;
+	cout << "Local sizes: " << localSizes[0] << " " << localSizes[1] << " " << localSizes[2] << " " << endl;
+	glDispatchCompute(globalSizes[0], globalSizes[1], globalSizes[2]);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	cout << "Computation Done" << endl;
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
@@ -418,6 +453,8 @@ void cubeMarch::generateGPU() {
 
 	//total vertices
 	totalVertices = sizeGrid.x * sizeGrid.y * sizeGrid.z * 12;
+
+
 }
 
 

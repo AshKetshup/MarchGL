@@ -70,7 +70,7 @@ class cubeMarch {
 	glm::vec3 getIntersVertice(glm::vec3 p1, glm::vec3 p2, float D1, float D2);
 	void generateSingle(glm::vec3 currPoint);
 	void generateCPU(void);
-	bool changeComputeShader(glm::ivec3 sizes, string iFunction);
+	bool changeComputeShader(glm::ivec3 sizes, string iFunction, int localSizes[3]);
 	void generateGPU(void);
 	void generate(void);
 

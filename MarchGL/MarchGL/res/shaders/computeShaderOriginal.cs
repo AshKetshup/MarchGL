@@ -29,15 +29,15 @@ layout(std430, binding = 2) buffer Input3
 
 layout(std140, binding = 3) buffer Output
 {
-    TRIANGLES allTriangles[size1][size2][size3]; //change after !!!!!!!!!!!!!!!!!!
+    //TRIANGLES allTriangles[size1][size2][size3]; //change after !!!!!!!!!!!!!!!!!!
+    TRIANGLES allTriangles[];
 }
 ;
 
 layout(std140, binding = 4) buffer OutputNormals
 {
-    TRIANGLES allNormals [size1]
-    [size2]
-    [size3]; //change after !!!!!!!!!!!!!!!!!!
+    //TRIANGLES allNormals [size1][size2][size3]; //change after !!!!!!!!!!!!!!!!!!
+    TRIANGLES allNormals[];
 }
 ;
 
@@ -52,11 +52,15 @@ uniform float dist;
 //uniform int obj; //0-sphere 1-torus
 
 //lim of the x, y, and z axis
-uniform float x_size;
-uniform float y_size;
-uniform float z_size;
+uniform int x_size;
+uniform int y_size;
+uniform int z_size;
 
-layout(local_size_x = 10, local_size_y = 10, local_size_z = 10) in;
+uniform int MX;
+uniform int MY;
+uniform int MZ;
+
+layout(local_size_x = localSize_x, local_size_y = localSize_y, local_size_z = localSize_z) in;
 
 
 vec4 getIntersVertice(vec4 p1, vec4 p2, float D1, float D2)
@@ -140,14 +144,27 @@ void main()
 
     int edgeFlag = edgeTable[bin_int];
     vec4 edgeVertices[12];
-    /*
+
+
+
+
+
+    uint width = (x_size * 2) ;
+    uint height = (y_size * 2);
+    uint depth = z_size * 2;
+    uint def_index = index_x + index_y * MX + index_z * MY * MX;
     for (int i = 0; i < 12; i++)
     {
-        //edgeVertices[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-        allTriangles[index_x][index_y][index_z].p[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        //allTriangles[index_x][index_y][index_z].p[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        //allNormals[index_x][index_y][index_z].p[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        
+        allTriangles[def_index].p[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        allNormals[def_index].p[i] = vec4(0.0f, 0.0f, 0.0f, 0.0f);
     }
-    */
-   
+    
+
+    
+
     if (edgeFlag != 0)
     {
         if ((edgeFlag & 1) != 0) edgeVertices[0] = getIntersVertice(p[0], p[1], d[0], d[1]); //edge 0
@@ -167,7 +184,34 @@ void main()
         //uint def_index = index_x * (gl_NumWorkGroups.y * gl_NumWorkGroups.z) + index_y * gl_NumWorkGroups.z + index_z;
 
         //def_index = (index_z - 1) * gl_NumWorkGroups.x * gl_NumWorkGroups.y+ (index_x - 1) * gl_NumWorkGroups.y+ index_y;
+
+
+
         
+        for (int n = 0; triTable[bin_int][n] != -1; n += 3)
+        {
+            allTriangles[def_index].p[n] = edgeVertices[triTable[bin_int][n]];
+            allTriangles[def_index].p[n + 1] = edgeVertices[triTable[bin_int][n + 1]];
+            allTriangles[def_index].p[n + 2] = edgeVertices[triTable[bin_int][n + 2]];
+
+
+            //normalization
+            vec3 a = vec3(allTriangles[def_index].p[n].x, allTriangles[def_index].p[n].y, allTriangles[def_index].p[n].z);
+            vec3 b = vec3(allTriangles[def_index].p[n + 1].x, allTriangles[def_index].p[n + 1].y, allTriangles[def_index].p[n + 1].z);
+            vec3 c = vec3(allTriangles[def_index].p[n + 2].x, allTriangles[def_index].p[n + 2].y, allTriangles[def_index].p[n + 2].z);
+
+
+            vec3 normal = -normalize(cross(b-a,c-a));
+            
+            allNormals[def_index].p[n] = vec4(normal, 0.0f);
+            allNormals[def_index].p[n + 1] = vec4(normal, 0.0f);
+            allNormals[def_index].p[n + 2] = vec4(normal, 0.0f);
+
+
+        }
+        
+        
+        /*
         for (int n = 0; triTable[bin_int][n] != -1; n += 3)
         {
             allTriangles[index_x][index_y][index_z].p[n] = edgeVertices[triTable[bin_int][n]];
@@ -181,15 +225,17 @@ void main()
             vec3 c = vec3(allTriangles[index_x][index_y][index_z].p[n + 2].x, allTriangles[index_x][index_y][index_z].p[n + 2].y, allTriangles[index_x][index_y][index_z].p[n + 2].z);
 
 
-            vec3 normal = -normalize(cross(b-a,c-a));
-            
+            vec3 normal = -normalize(cross(b - a, c - a));
+
             allNormals[index_x][index_y][index_z].p[n] = vec4(normal, 0.0f);
             allNormals[index_x][index_y][index_z].p[n + 1] = vec4(normal, 0.0f);
             allNormals[index_x][index_y][index_z].p[n + 2] = vec4(normal, 0.0f);
 
 
         }
+        */
         
+
     }
 
 
