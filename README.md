@@ -5,7 +5,7 @@ s
 
 - All 15 unique possible cases:
 
-![Pasted image 20230120181503](C:\Users\nunom\Documents\MEGAsync\CIV\CIV-2\Pasted image 20230120181503.png)
+![Pasted image 20230120181503](20230120181503.png)
 
 ![Pasted image 20230122033900](C:\Users\nunom\Documents\MEGAsync\CIV\CIV-2\Pasted image 20230122033900.png)
 
