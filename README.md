@@ -44,5 +44,3 @@ Iso-Surfaces using Marching Cubes in Modern OpenGL
 	  3. "Organize" the vertices, in a way that the correct triangles are drawn (lookup third table, using the vertice binary)
 
 
-
-# 
