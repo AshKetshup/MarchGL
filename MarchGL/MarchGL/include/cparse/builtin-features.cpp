@@ -4,4 +4,4 @@
  * at static initialization time:
  */
 #define STATIC_CPARSE_STARTUP
-#include "./builtin-features.inc"
+#include "./builtin-features.h"

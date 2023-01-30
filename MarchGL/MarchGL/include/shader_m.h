@@ -15,7 +15,8 @@
 #define SHADER_VERTEX       0b00000001
 #define SHADER_FRAGMENT     0b00000010
 #define SHADER_GEOMETRY     0b00000100
-#define SHADER_PROGRAM      0b00001000
+#define SHADER_COMPUTE      0b00001000
+#define SHADER_PROGRAM      0b00010000
 
 #define TYPE_READING        0b00100000
 #define TYPE_COMPILATION    0b01000000
@@ -45,6 +46,7 @@ class ShaderReport {
 		if (error & SHADER_VERTEX)      log += "vertex shader ";
 		if (error & SHADER_FRAGMENT)    log += "fragment shader ";
 		if (error & SHADER_GEOMETRY)    log += "geometry shader ";
+		if (error & SHADER_COMPUTE)     log += "compute shader ";
 		if (error & SHADER_PROGRAM)     log += "shader program ";
 		log += "(message: " + message + ").";
 		return log;

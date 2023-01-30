@@ -3,9 +3,10 @@
 
 #include <windows.h>
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+#include <ImGUI/imgui.h>
+#include <ImGUI/imgui_stdlib.h>
+#include <ImGUI/imgui_impl_glfw.h>
+#include <ImGUI/imgui_impl_opengl3.h>
 
 #include <camera.h>
 #include <GLFW/glfw3.h>
@@ -17,11 +18,7 @@
 #include <filesystem>
 #include <iostream>
 
-//#include "implicit.h"
-#include "squareMarch.h"
-#include <cubeMarch.h>
-
-#include <torusObj.h>
+#include "cubeMarch.h"
 
 using namespace std;
 using namespace glm;
@@ -114,8 +111,12 @@ class MarchGL {
 	render_mode rmode;
 	unsigned threadAmount;
 
+	cubeMarch* marchingCubes;
+
 	Arguments args;
-	SHADER_SETTINGS s;
+	SHADER_SETTINGS sS;
+	RENDER_SETTINGS rS;
+	IMPLICIT_FUNCTION iF;
 
 	GLFWwindow* window;
 	unsigned scr_width;

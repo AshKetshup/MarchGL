@@ -1,17 +1,15 @@
 #ifndef CUBEMARCH_H
 #define CUBEMARCH_H
 
-#include <shader_m.h>
+#include <computeshader.h>
 #include <camera.h>
-
-#include <random>
 
 #include "marchingutils.h"
 
 typedef struct {
-	glm::vec3 p[8];
+	glm::vec3 p;
+	float val;
 } VOXEL;
-
 
 typedef struct {
 	glm::vec4 colorMesh;
@@ -20,53 +18,66 @@ typedef struct {
 	glm::vec3 lightPos;
 } SHADER_SETTINGS;
 
+typedef struct {
+	int renderMode;
+	int threadAmount;
+	float cubeSize;
+	glm::vec3 gridSize;
+} RENDER_SETTINGS;
+
+typedef struct {
+	std::string function;
+} IMPLICIT_FUNCTION;
+
+typedef struct {
+	glm::vec4 p[12];
+} TRIANGLES;
+
 class cubeMarch {
-	public:
-	Shader basicShader;								//color shader
-	Shader shader;									//
+	private:
+	ComputeShader computeShader;					// Compute Shader
+	Shader basicShader;								// Grid shader
+	Shader shader;									// Mesh shader
+	std::vector<glm::vec3> meshTriangles, normals;	// vertices for the triangles (mesh)
 	unsigned VAO, meshVAO, gridVAO, gridLinesVAO;
-	float radius = 1.0f;							//radius of the sphere
-	std::vector<float> vertices;					//vertices of the sphere
-	float gridDist = 0.01f;							//distance between each vertice of the VOXELS (dist between every point in the grid)
-	int gridPoints;									//total grid points (for drawing)
-	std::vector<float> cmgrid;						//vertices of the grid
-	std::vector<VOXEL> voxels;									//voxels
-	std::vector<glm::vec3> meshTriangles;			//vertices for the triangles (mesh)
-	string obj;
+	RENDER_SETTINGS renderSettings;
+	string iFunction;
+	glm::ivec3 size;
+
+	int totalVertices = 0;
 
 	int width, height = 0;
 
-	//torus
-	float R1 = 1.0f;
-	float R2 = 0.5f;
+	unsigned computeVAO;
 
-	//box limit
-	glm::vec3 box_lim = glm::vec3(0.0f);
+	public:
+	cubeMarch(void);
+	cubeMarch(RENDER_SETTINGS& rS);
+	void setIFunction(IMPLICIT_FUNCTION& iF);
 
-	cubeMarch(std::string obj = "sphere");
-
-	//----sphere (for comparison)----
-	void createSphere();
-	void drawSphere(Camera camera);
-
-	//----grid----
-	void createGrid();
-	void drawGrid(Camera camera);
-
-	//-----marching cubes algorithm-----
-
-	//checks if the point is inside or outside the sphere
+	//----- Marching Cubes Algorithm -----
+	/*
+	 * Checks if the point is inside or outside the sphere
+	 */
 	float getDensity(glm::vec3 p);
 
-	//returns the middle point between the two vertices
+	/*
+	 * Returns the interpolated point between the two vertices
+	 */
 	glm::vec3 getIntersVertice(glm::vec3 p1, glm::vec3 p2, float D1, float D2);
+	void generateSingle(glm::vec3 currPoint);
+	void generateCPU(void);
+	bool changeComputeShader(glm::ivec3 sizes, string iFunction);
+	void generateGPU(void);
+	void generate(void);
 
-	//marching cubes without isovalues
-	void marchingCubesSimple();
-
-	//----mesh----
-	void createMesh();
+	//---- Mesh ----
+	void createMesh(void);
 	void drawMesh(Camera camera, glm::vec3 trans, SHADER_SETTINGS& settings);
+
+	//---- Grid ----
+	// void createGrid();
+	// void drawGrid(Camera camera);
 };
 
 #endif

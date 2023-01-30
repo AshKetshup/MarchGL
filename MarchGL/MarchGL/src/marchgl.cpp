@@ -59,7 +59,8 @@ namespace callback {
 		);
 
 		getInstance()->setMouseData(pos, false);
-		getInstance()->getCamera().ProcessMouseMovement(offsets.x, offsets.y);
+		if (!getInstance()->getGUIMode())
+			getInstance()->getCamera().ProcessMouseMovement(offsets.x, offsets.y);
 
 	}
 
@@ -203,11 +204,17 @@ MarchGL::MarchGL(Arguments args) {
 			cout << "\t| Render Mode: GPU" << endl;
 		}
 
-		threadAmount = args.threads;
-		cout << "\t| Threads: " << threadAmount << endl;
+		rS.threadAmount = args.threads;
+		cout << "\t| Threads: " << rS.threadAmount << endl;
 
 		scr_height = args.height;
 		scr_width = args.width;
+
+		sS.colorLight = vec4(1.f);
+		sS.colorMesh = vec4(this->SURF_DEFAULT_COLOR, 1.f);
+
+		rS.gridSize = vec3(1.f);
+		rS.cubeSize = 0.1f;
 
 		cout << "\t| Window Resolution: " << scr_width << "x" << scr_height << endl;
 		cout << "\t[OK]\n" << endl;
@@ -241,13 +248,14 @@ MarchGL::MarchGL(Arguments args) {
 		cout << "\t| GLAD: Success" << endl;
 		cout << "\t[OK]\n" << endl;
 
-
 		cout << "\tLoading Starting Shaders: " << endl;
 
 		cout << "\t[OK]\n" << endl;
 
 		cout << "[OK]" << endl;
 		cout << "Done.\n" << endl;
+
+		marchingCubes = new cubeMarch();
 
 	} catch (const MarchGLException& e) {
 		cerr << "[Error]: " << e.what() << endl;
@@ -268,9 +276,9 @@ void MarchGL::main(void) {
 
 	initializeImGUI();
 
-	cubeMarch torus = cubeMarch( "torus");
 	//cubeMarch sphere = cubeMarch("sphere");
-
+	//cubeMarch s = cubeMarch();
+	//s.generateGPU();
 	while (!glfwWindowShouldClose(getWindow())) {
 		crntTime = glfwGetTime();
 		timeDiff = crntTime - prevTime;
@@ -285,16 +293,7 @@ void MarchGL::main(void) {
 
 		refresh();
 
-		s.cameraLightSnap = cameraLightSnap;
-		s.lightPos = lightPos;
-		s.colorLight = vec4(lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-		s.colorMesh = vec4(meshColor.x, meshColor.y, meshColor.z, meshColor.w);
-
-		torus.drawMesh(camera, vec3(0.0f), s);
-		//torus.drawGrid(camera);
-		//sphere.drawMesh(camera, vec3(3.0f), s);
-		//sphere.drawSphere(camera);
-		//sphere.drawGrid(camera);
+		//s.drawMesh(camera, vec3(0), sS);
 		renderUI();
 
 		glfwSwapBuffers(window);
@@ -303,7 +302,7 @@ void MarchGL::main(void) {
 }
 
 action MarchGL::processInput(void) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
 	camera.MovementSpeed = ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS )
@@ -340,26 +339,55 @@ void MarchGL::newFrameUI(void) {
 void MarchGL::renderUI(void) {
 	{
 		ImGui::Begin("Shader Settings");
+
 		ImGui::Text("Mesh Color");
-		ImGui::ColorEdit3("", &meshColor.x);
+		ImGui::ColorEdit3("", &sS.colorMesh.x);
+
+		ImGui::Spacing();
 
 		ImGui::Text("Light Color");
-		ImGui::ColorEdit3("", &lightColor.x);
+		ImGui::ColorEdit3("", &sS.colorLight.x);
 
-		ImGui::Checkbox("Snap light to camera", &cameraLightSnap);
+		ImGui::Checkbox("Snap light to camera", &sS.cameraLightSnap);
 
-		ImGui::SliderFloat3("Light Position", &lightPos.x, -200.f, 200.f);
+		ImGui::SliderFloat3("Light Position", &sS.lightPos.x, -10.f, 10.f);
 
 		ImGui::End();
 	}
 
 	{
 		ImGui::Begin("Render Settings");
-		//ImGui::RadioButton();
+
+		ImGui::RadioButton("CPU", &rS.renderMode, 0);
+		ImGui::SameLine();
+		ImGui::RadioButton("GPU", &rS.renderMode, 1);
+
+		ImGui::BeginDisabled(rS.renderMode != 0);
+		ImGui::InputInt("Thread Amount", &rS.threadAmount);
+		ImGui::EndDisabled();
+
+		ImGui::InputFloat("Voxel Size", &rS.cubeSize, 0.000F, 0.00F);
+		ImGui::SliderFloat3("Grid Size", &rS.gridSize.x, -5.f, 5.f);
+
+		if (ImGui::Button("Apply"))
+			marchingCubes = new cubeMarch(rS);
+
 		ImGui::End();
 	}
 
+	{
+		ImGui::Begin("Implicit Functions");
 
+		ImGui::Text("Function (f = 0)");
+		ImGui::InputText(" ", &iF.function);
+
+		if (ImGui::Button("Render")) {
+			marchingCubes->setIFunction(iF);
+			marchingCubes->generate();
+		}
+
+		ImGui::End();
+	}
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -371,9 +399,9 @@ void MarchGL::refresh(void) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 
-	glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.f);
+	glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	newFrameUI();
 
 	currentFrame = glfwGetTime();
@@ -394,6 +422,13 @@ void MarchGL::refresh(void) {
 		default:
 			break;
 	}
+
+	/*sS.cameraLightSnap = cameraLightSnap;
+	sS.lightPos = lightPos;
+	sS.colorLight = vec4(lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	sS.colorMesh = vec4(meshColor.x, meshColor.y, meshColor.z, meshColor.w);*/
+
+	marchingCubes->drawMesh(camera, vec3(0.0f), sS);
 }
 
 void MarchGL::terminate(void) {

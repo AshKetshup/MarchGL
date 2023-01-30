@@ -3,6 +3,18 @@
 
 #define MARCHINGUTILS_H
 namespace tbl {
+
+	constexpr float vertexOffset[8][3] = {
+		{0.0, 0.0, 0.0},
+		{1.0, 0.0, 0.0},
+		{1.0, 1.0, 0.0},
+		{0.0, 1.0, 0.0},
+		{0.0, 0.0, 1.0},
+		{1.0, 0.0, 1.0},
+		{1.0, 1.0, 1.0},
+		{0.0, 1.0, 1.0}
+	};
+
 	constexpr int edgeTable[256] = {
 		0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
 		0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00,
