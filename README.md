@@ -20,10 +20,10 @@ Iso-Surfaces using Marching Cubes in Modern OpenGL
 
 - All 15 unique possible cases:
 
-![Pasted image 20230120181503](https://github.com/AshKetshup/MarchGL/tree/TheMainTimeline/images/Pasted%20image%2020230120181503.png)
+![cubes1](https://github.com/AshKetshup/MarchGL/tree/TheMainTimeline/images/Pasted%20image%2020230120181503.png)
 
 
-![Pasted image 20230122033900](https://github.com/AshKetshup/MarchGL/tree/TheMainTimeline/images/Pasted%20image%2020230122033900.png)
+![cubes2](https://github.com/AshKetshup/MarchGL/tree/TheMainTimeline/images/Pasted%20image%2020230122033900.png)
 
 - Black: vertices numbers
 - Red: edges numbers
