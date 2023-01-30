@@ -20,7 +20,7 @@ Iso-Surfaces using Marching Cubes in Modern OpenGL
 
 - All 15 unique possible cases:
 
-<<<<<<< HEAD
+
 ![Pasted image 20230120181503](images\Pasted image 20230120181503.png)
 
 
