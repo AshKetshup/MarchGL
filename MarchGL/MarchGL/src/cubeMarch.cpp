@@ -1,7 +1,7 @@
 #include "cubeMarch.h"
 
-#include "cparse/shunting-yard.h";
-#include "cparse/builtin-features.h";
+#include "cparse/shunting-yard.h"
+#include "cparse/builtin-features.h"
 
 #include <random>
 #include <glm/gtx/normal.hpp>
@@ -33,16 +33,16 @@ cubeMarch::cubeMarch(void) {
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
 
-	/*
+
 	std::cout << "LOADING CubeMarch COMPUTE SHADER: ... " << std::endl << std::endl;
-	computeShader = ComputeShader("res/shaders/marchingcubes_cs.glsl");
+	computeShader = ComputeShader("res/shaders/computeShaderOriginal.cs");
 	if (!computeShader.wasSuccessful()) {
 		std::cout << "Shader was not successful" << std::endl;
 		std::cout << computeShader.getReport() << std::endl;
 		return;
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl;
-		*/
+
 }
 
 cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
@@ -60,30 +60,24 @@ cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
 		std::cout << "Shader was not successful" << std::endl;
 		std::cout << shader.getReport() << std::endl;
 		return;
-	}
-	else
+	} else
 		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
 
+
 	std::cout << "LOADING CubeMarch COMPUTE SHADER: ... " << std::endl << std::endl;
-	/*
-	computeShader = ComputeShader("res/shaders/marchingcubes_cs.glsl");
+	computeShader = ComputeShader("res/shaders/computeShaderOriginal.cs");
 	if (!computeShader.wasSuccessful()) {
 		std::cout << "Shader was not successful" << std::endl;
 		std::cout << computeShader.getReport() << std::endl;
 		return;
-	}
-	else
+	} else
 		std::cout << std::endl << "[DONE]" << std::endl;
-	*/
 
 
 
-	
-	
-	
-	rS.gridSize.x = (float)((int)(rS.gridSize.x));
-	rS.gridSize.y = (float)((int)(rS.gridSize.y));
-	rS.gridSize.z = (float)((int)(rS.gridSize.z));
+	rS.gridSize.x = (float) ( (int) ( rS.gridSize.x ) );
+	rS.gridSize.y = (float) ( (int) ( rS.gridSize.y ) );
+	rS.gridSize.z = (float) ( (int) ( rS.gridSize.z ) );
 
 	totalVertices = 0;
 	renderSettings = rS;
@@ -93,7 +87,7 @@ cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
 	cout << "Grid Size: " << renderSettings.gridSize.x << " " << renderSettings.gridSize.y << " " << renderSettings.gridSize.z << endl;
 	cout << "Render Mode: " << renderSettings.renderMode << endl;
 	cout << "Thread Amount: " << renderSettings.threadAmount << endl;
-	
+
 }
 
 void cubeMarch::generateSingle(glm::vec3 currPoint) {
@@ -116,8 +110,6 @@ void cubeMarch::generateSingle(glm::vec3 currPoint) {
 	if (bin == 0b00000000 || bin == 0b11111111)
 		return;
 
-	//std::cout << "bin: " << bin << std::endl;
-
 	int edgeFlag = tbl::edgeTable[bin];
 
 	glm::vec3 edgeVertices[12];
@@ -135,18 +127,6 @@ void cubeMarch::generateSingle(glm::vec3 currPoint) {
 	if (edgeFlag & 512) edgeVertices[9] = getIntersVertice(voxel[1].p, voxel[5].p, voxel[1].val, voxel[5].val); //edge 9
 	if (edgeFlag & 1024) edgeVertices[10] = getIntersVertice(voxel[2].p, voxel[6].p, voxel[2].val, voxel[6].val); //edge 10
 	if (edgeFlag & 2048) edgeVertices[11] = getIntersVertice(voxel[3].p, voxel[7].p, voxel[3].val, voxel[7].val); //edge 11
-
-	//std::cout << "Setting the edge vertices: ... ";
-	/*for (size_t edge = 0; edge < 12; edge++) {
-		if (edgeFlag & ( 1 << edge ))
-			edgeVertices[edge] = getIntersVertice(
-				voxel[edge % 8].p,
-				voxel[( edge + 1 ) % 8].p,
-				voxel[edge % 8].val,
-				voxel[( edge + 1 ) % 8].val
-			);
-	}*/
-	//std::cout << "[DONE]" << std::endl;
 
 	//std::cout << "Adding vertices and normals to buffers: ... ";
 	for (size_t n = 0; tbl::triTable[bin][n] != -1; n += 3) {
@@ -178,181 +158,31 @@ void cubeMarch::generateCPU(void) {
 				generateSingle(glm::vec3(x, y, z));
 }
 
-/*
-void cubeMarch::generateGPU(void) {
-	computeShader.recompileWithFunctions(iFunction);
-
-	glm::ivec3 sizeGrid = ( renderSettings.gridSize * glm::vec3(2) ) / renderSettings.cubeSize;
-
-	GLuint meshBuffer, normalBuffer;
-
-	glGenBuffers(1, &meshBuffer);
-	glGenBuffers(1, &normalBuffer);
-
-	const int bufferSize = sizeGrid.x * sizeGrid.y * sizeGrid.z * 16;
-
-	glm::vec3* gMeshTriangles = new glm::vec3[bufferSize];
-	glBindBuffer(GL_ARRAY_BUFFER, meshBuffer);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(gMeshTriangles), NULL, GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, meshBuffer);
-
-
-	glm::vec3* gNormals = new glm::vec3[bufferSize];
-	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(gNormals), NULL, GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, normalBuffer);
-
-	//glBindVertexArray(0);
-
-	for (size_t i = 0; i < bufferSize; i++) {
-		cout << gNormals[i].x << ", " << gNormals[i].y << ", " << gNormals[i].z << endl;
-		meshTriangles.push_back(gMeshTriangles[i]);
-		normals.push_back(gNormals[i]);
-	}
-
-	computeShader.use();
-	computeShader.setFloat("voxelSize", renderSettings.cubeSize);
-	computeShader.setVec3("gridSize", sizeGrid);
-
-	computeShader.execute(sizeGrid.x, sizeGrid.y, sizeGrid.z);
-
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, normalBuffer);
-	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize * sizeof(glm::vec3), &gNormals);
-
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, meshBuffer);
-	glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize * sizeof(glm::vec3), &gMeshTriangles);
-}
-*/
-
-
-//change the parameters in the compute shader
-bool cubeMarch::changeComputeShader(glm::ivec3 sizes, string iFunction, int localSizes[3]) {
-	// File to be read
-	string fileName = "res/shaders/computeShaderOriginal.cs";
-
-	// Open the file in input mode
-	fstream file;
-	file.open(fileName, ios::in);
-
-	// Check if the file is open
-	if (!file) {
-		cout << "Error opening fileeee" << endl;
-		return 1;
-	}
-
-	// Create a string to store the file contents
-	string fileContents;
-
-	// Read the file into the string
-	while (file) {
-		string line;
-		getline(file, line);
-		fileContents += line + '\n';
-	}
-
-	// Close the file
-	file.close();
-
-	// Replace the old string with the new string
-	size_t pos = 0;
-	string oldString = "size1";
-	string newString = std::to_string(sizes.x);
-	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
-		fileContents.replace(pos, oldString.length(), newString);
-		pos += newString.size();
-	}
-
-	pos = 0;
-	oldString = "size2";
-	newString = std::to_string(sizes.y);
-	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
-		fileContents.replace(pos, oldString.length(), newString);
-		pos += newString.size();
-	}
-
-	pos = 0;
-	oldString = "size3";
-	newString = std::to_string(sizes.z);
-	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
-		fileContents.replace(pos, oldString.length(), newString);
-		pos += newString.size();
-	}
-
-	pos = 0;
-	oldString = "iFunction";
-	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
-		fileContents.replace(pos, oldString.length(), iFunction);
-		pos += iFunction.size();
-	}
-
-	pos = 0;
-	oldString = "localSize_x";
-	newString = std::to_string(localSizes[0]);
-	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
-		fileContents.replace(pos, oldString.length(), newString);
-		pos += newString.size();
-	}
-
-	pos = 0;
-	oldString = "localSize_y";
-	newString = std::to_string(localSizes[1]);
-	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
-		fileContents.replace(pos, oldString.length(), newString);
-		pos += newString.size();
-	}
-
-	pos = 0;
-	oldString = "localSize_z";
-	newString = std::to_string(localSizes[2]);
-	while ((pos = fileContents.find(oldString, pos)) != string::npos) {
-		fileContents.replace(pos, oldString.length(), newString);
-		pos += newString.size();
-	}
-
-	
-
-
-	// Open the file for output
-	file.open("res/shaders/computeShader.cs", ios::out);
-
-	// Check if the file is open
-	if (!file) {
-		cout << "Error opening file" << endl;
-		return 1;
-	}
-
-	// Write the modified file contents to the file
-	file << fileContents;
-
-	// Close the file
-	file.close();
-
-	cout << "File modified successfully!" << endl;
-	return 0;
-}
-
-
 //---------------------------------------------------------GPU------------------------------------
 
 void cubeMarch::generateGPU() {
-	glm::ivec3 sizeGrid = (renderSettings.gridSize * glm::vec3(2)) / renderSettings.cubeSize;
+
+	glm::ivec3 sizeGrid = ( renderSettings.gridSize * glm::vec3(2) ) / renderSettings.cubeSize;
+
 	cout << "Going to change the CS" << endl;
 	cout << "iFunction: " << iFunction << endl;
-	int localSizes[] = { 50, 50, 50 };
-	if (sizeGrid.x < 50) localSizes[0] = 1;
-	if (sizeGrid.y < 50) localSizes[1] = 1;
-	if (sizeGrid.z < 50) localSizes[2] = 1;
-	changeComputeShader(sizeGrid, iFunction, localSizes);
-	int globalSizes[] = { sizeGrid.x / localSizes[0],sizeGrid.y / localSizes[1], sizeGrid.z / localSizes[2] };
-	
+
+	int localSizes[] = { 1, 1, 1 };
+
+
+	computeShader.recompileWithFunctions(iFunction);
+
+	//changeComputeShader(sizeGrid, iFunction, localSizes);
+
+	int globalSizes[] = {
+		sizeGrid.x / localSizes[0],
+		sizeGrid.y / localSizes[1],
+		sizeGrid.z / localSizes[2]
+	};
+
 	//compile the CS
-	ComputeShader computeShader("res/shaders/computeShader.cs");
+	//ComputeShader computeShader("res/shaders/computeShader.cs");
+
 	cout << "Compiled with sucess" << endl;
 	//computation sizes
 	int maxWorkGroupSize[3], workGroupCounts[3], workGroupInvocations[3];
@@ -414,19 +244,19 @@ void cubeMarch::generateGPU() {
 
 	cout << "Starting compute shader" << endl;
 	cout << "Total size " << sizeGrid.x * sizeGrid.y * sizeGrid.z << endl;
-	cout << "Sizes: " << sizeGrid.x <<" " << sizeGrid.y << " "<< sizeGrid.z << endl;
+	cout << "Sizes: " << sizeGrid.x << " " << sizeGrid.y << " " << sizeGrid.z << endl;
+
 	//compute shader
 	computeShader.use();
-	computeShader.setFloat("dist", renderSettings.cubeSize);
-	//computeShader.setFloat("radius", 1.0f);
-	//computeShader.setInt("obj", 0);
-	computeShader.setInt("x_size", (int)(renderSettings.gridSize.x));
-	computeShader.setInt("y_size", (int)(renderSettings.gridSize.y));
-	computeShader.setInt("z_size", (int)(renderSettings.gridSize.z));
 
+	computeShader.setFloat("dist", renderSettings.cubeSize);
+	computeShader.setInt("x_size", (int) ( renderSettings.gridSize.x ));
+	computeShader.setInt("y_size", (int) ( renderSettings.gridSize.y ));
+	computeShader.setInt("z_size", (int) ( renderSettings.gridSize.z ));
 	computeShader.setInt("MX", sizeGrid.x);
 	computeShader.setInt("MY", sizeGrid.y);
 	computeShader.setInt("MZ", sizeGrid.z);
+
 	cout << "Global sizes: " << globalSizes[0] << " " << globalSizes[1] << " " << globalSizes[2] << " " << endl;
 	cout << "Local sizes: " << localSizes[0] << " " << localSizes[1] << " " << localSizes[2] << " " << endl;
 	glDispatchCompute(globalSizes[0], globalSizes[1], globalSizes[2]);
@@ -440,21 +270,18 @@ void cubeMarch::generateGPU() {
 	glGenVertexArrays(1, &meshVAO);
 	glBindVertexArray(meshVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, triangles);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*) 0);
 	glEnableVertexAttribArray(0);
 	//glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind
 
 	glBindBuffer(GL_ARRAY_BUFFER, normals);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,0, (void*)0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*) 0);
 	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 
-
 	//total vertices
 	totalVertices = sizeGrid.x * sizeGrid.y * sizeGrid.z * 12;
-
-
 }
 
 
@@ -466,18 +293,17 @@ void cubeMarch::generate(void) {
 	normals.clear();
 
 	std::cout << "Running Marching Cube" << std::endl;
-	
+
 
 	if (renderSettings.renderMode == 0) {
 		generateCPU();
 		createMesh();
-	}
-	else {
+	} else {
 		generateGPU();
 	}
 	std::cout << std::endl << "[DONE]" << std::endl << std::endl;
 
-	
+
 }
 
 //------------------------------------------------------------------------------------------------

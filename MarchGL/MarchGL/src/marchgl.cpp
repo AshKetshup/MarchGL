@@ -366,8 +366,8 @@ void MarchGL::renderUI(void) {
 		ImGui::InputInt("Thread Amount", &rS.threadAmount);
 		ImGui::EndDisabled();
 
-		ImGui::InputFloat("Voxel Size", &rS.cubeSize, 0.000F, 0.00F);
-		ImGui::SliderFloat3("Grid Size", &rS.gridSize.x, -5.f, 5.f);
+		ImGui::InputFloat("Voxel Size", &rS.cubeSize, 0.00F, 0.00F, "%.2f");
+		ImGui::SliderFloat3("Grid Size", &rS.gridSize.x, 0.f, 10.f);
 
 		if (ImGui::Button("Apply"))
 			marchingCubes = new cubeMarch(rS);
@@ -401,7 +401,7 @@ void MarchGL::refresh(void) {
 
 	glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	newFrameUI();
 
 	currentFrame = glfwGetTime();

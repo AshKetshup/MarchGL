@@ -42,6 +42,7 @@ class ComputeShader {
 
 	public:
 	unsigned int ID;
+
 	ComputeShader(void) { }
 	// Constructor generates the compute shader on the fly
 	// ------------------------------------------------------------------------
@@ -229,6 +230,7 @@ class ComputeShader {
 	unsigned int getID() {
 		return ID;
 	}
+
 };
 
 #endif
