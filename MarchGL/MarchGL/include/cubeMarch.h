@@ -1,7 +1,6 @@
 #ifndef CUBEMARCH_H
 #define CUBEMARCH_H
 
-//#include <shader_c.h>
 #include <computeshader.h>
 #include <camera.h>
 
@@ -19,8 +18,15 @@ typedef struct {
 	glm::vec4 colorLight;
 	bool cameraLightSnap;
 	glm::vec3 lightPos;
+
 	bool gridOn;
 	bool meshOn;
+	bool skyboxOn;
+
+	float refractVal;
+	bool isRefract;
+	bool isReflect;
+	float ratioRefractReflect;
 } SHADER_SETTINGS;
 
 typedef struct {
@@ -49,11 +55,8 @@ class cubeMarch {
 	RENDER_SETTINGS renderSettings;
 	string iFunction;
 	glm::ivec3 size;
-
 	int totalVertices = 0;
-
 	int width, height = 0;
-
 	unsigned computeVAO;
 
 	public:
@@ -75,6 +78,8 @@ class cubeMarch {
 	void generateCPU(void);
 	void generateGPU(void);
 	void generate(void);
+
+	glm::vec3 getNormal(glm::vec3 p);
 
 	//---- Mesh ----
 	void createMesh(void);

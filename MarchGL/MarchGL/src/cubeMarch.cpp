@@ -25,7 +25,6 @@ cubeMarch::cubeMarch(void) {
 
 	std::cout << "LOADING CubeMarch SHADER: ... " << std::endl << std::endl;
 	shader = Shader("res/shaders/basicShader_vs.glsl", "res/shaders/basicShader_fs.glsl");
-	basicShader = Shader("res/shaders/basicColorShader_vs.glsl", "res/shaders/basicColorShader_fs.glsl");
 	if (!shader.wasSuccessful()) {
 		std::cout << "Shader was not successful" << std::endl;
 		std::cout << shader.getReport() << std::endl;
@@ -50,6 +49,9 @@ cubeMarch::cubeMarch(void) {
 		return;
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl;
+
+	shader.use();
+	shader.setInt("skybox", 0);
 
 	createGrid();
 }
@@ -159,11 +161,9 @@ void cubeMarch::generateSingle(glm::vec3 currPoint) {
 		meshTriangles.push_back(c);
 		totalVertices += 3;
 
-		normal = -glm::normalize(glm::triangleNormal(a, b, c));
-
-		normals.push_back(normal);
-		normals.push_back(normal);
-		normals.push_back(normal);
+		normals.push_back(getNormal(a));
+		normals.push_back(getNormal(b));
+		normals.push_back(getNormal(c));
 	}
 	//std::cout << "[DONE]" << std::endl;
 }
@@ -416,6 +416,18 @@ float cubeMarch::getDensity(glm::vec3 p) {
 	return result;
 }
 
+glm::vec3 cubeMarch::getNormal(glm::vec3 p) {
+	glm::vec2 e(0.001f, 0.0f);
+
+	return glm::normalize(
+		getDensity(p) - glm::vec3(
+			getDensity(p - glm::vec3(e.x, e.y, e.y)),
+			getDensity(p - glm::vec3(e.y, e.x, e.y)),
+			getDensity(p - glm::vec3(e.y, e.y, e.x))
+		)
+	);
+}
+
 //returns the middle point between the two vertices
 glm::vec3 cubeMarch::getIntersVertice(glm::vec3 p1, glm::vec3 p2, float D1, float D2) {
 	if (abs(D1) < 0.00001)
@@ -485,6 +497,12 @@ void cubeMarch::drawMesh(Camera camera, glm::vec3 trans, SHADER_SETTINGS& settin
 	shader.setVec4("lamp.lightColor", settings.colorLight);
 	shader.setVec3("lamp.lightPos", ( settings.cameraLightSnap ) ? camera.Position : settings.lightPos);
 	shader.setVec3("lamp.viewPos", camera.Position);
+
+	shader.setBool("isReflect", settings.isReflect);
+	shader.setBool("isRefract", settings.isRefract);
+	shader.setFloat("refractVal", settings.refractVal);
+	shader.setFloat("ratioRefractReflect", settings.ratioRefractReflect);
+
 
 	glBindVertexArray(meshVAO);
 	glDrawArrays(GL_TRIANGLES, 0, totalVertices);

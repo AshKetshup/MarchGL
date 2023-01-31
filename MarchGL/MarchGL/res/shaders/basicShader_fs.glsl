@@ -11,10 +11,33 @@ struct Lamp {
     vec3 viewPos;
 };
 
+uniform bool isRefract;
+uniform bool isReflect;
+
+uniform float refractVal;
+
+uniform float ratioRefractReflect;
+
+uniform samplerCube skybox;
+
 uniform vec4 objectColor;
 uniform Lamp lamp;
 
 void main() {
+    vec3 I = normalize(FragPos - lamp.viewPos);
+    vec3 resultColor = objectColor.xyz;
+    
+    if (isReflect || isRefract) {
+        vec3 rfl, rfr = vec3(1.0);
+        if (isReflect)
+            rfl = reflect(I, normalize(Normal));
+        if (isRefract)
+            rfr = refract(I, normalize(Normal), refractVal);
+
+        resultColor = mix(texture(skybox, rfr).rgb, texture(skybox, rfl).rgb, ratioRefractReflect);
+    }
+
+
     // ambient
     float ambientStrength = 0.5;
     vec3 ambient;
@@ -41,7 +64,7 @@ void main() {
     // result
     vec3 result = vec3(0.0);
     result += (ambient + diffuse + specular);
-    result *= objectColor.xyz;
+    result *= mix(objectColor.xyz, resultColor, 0.5);
 
     //FragColor = lamp.lightColor;
 

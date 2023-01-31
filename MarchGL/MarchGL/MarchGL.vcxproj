@@ -155,6 +155,7 @@
     <ClCompile Include="include\cparse\functions.cpp" />
     <ClCompile Include="include\cparse\packToken.cpp" />
     <ClCompile Include="include\cparse\shunting-yard.cpp" />
+    <ClCompile Include="src\cubemap.cpp" />
     <ClCompile Include="src\cubeMarch.cpp" />
     <ClCompile Include="include\ImGUI\imgui.cpp" />
     <ClCompile Include="include\ImGUI\imgui_demo.cpp" />
@@ -181,6 +182,8 @@
     <None Include="res\shaders\basicColorShader_vs.glsl" />
     <None Include="res\shaders\basicShader_fs.glsl" />
     <None Include="res\shaders\basicShader_vs.glsl" />
+    <None Include="res\shaders\skybox_fs.glsl" />
+    <None Include="res\shaders\skybox_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
@@ -195,6 +198,7 @@
     <ClInclude Include="include\cparse\packToken.h" />
     <ClInclude Include="include\cparse\shunting-yard-exceptions.h" />
     <ClInclude Include="include\cparse\shunting-yard.h" />
+    <ClInclude Include="include\cubemap.h" />
     <ClInclude Include="include\cubeMarch.h" />
     <ClInclude Include="include\filesys.hpp" />
     <ClInclude Include="include\glad\glad.h" />

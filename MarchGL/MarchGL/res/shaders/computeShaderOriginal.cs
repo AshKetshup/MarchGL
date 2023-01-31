@@ -66,13 +66,29 @@ vec4 getIntersVertice(vec4 p1, vec4 p2, float D1, float D2) {
     return ( 1 - t ) * p1 + t * p2;
 }
 
-float getDensity(float x, float y, float z) {
+float getDensity(vec3 p) {
+    float x = p.x;
+    float y = p.y;
+    float z = p.z;
+
     //if (obj == 0) return p.x * p.x + p.y * p.y + p.z * p.z - radius * radius;
     //else return ((sqrt(p.x * p.x + p.y * p.y) - radius) * (sqrt(p.x * p.x + p.y * p.y) - radius) + p.z * p.z - (radius / 2) * (radius / 2));
 
     // <IFunction>
 
     return 0.0f;
+}
+
+vec3 getNormal(vec3 p) {
+    vec2 e = vec2(0.001f, 0.0f);
+
+    return normalize(
+        getDensity(p) - vec3(
+            getDensity(p - e.xyy),
+            getDensity(p - e.yxy),
+            getDensity(p - e.yyx)
+        )
+    );
 }
 
 void main() {
@@ -101,7 +117,7 @@ void main() {
     //densities
     float d[8];
     for (int i = 0; i < 8; i++) {
-        d[i] = getDensity(p[i].x, p[i].y, p[i].z);
+        d[i] = getDensity(p[i].xyz);
 
         //check if is inside the sphere
         if (d[i] < 0.0f)
@@ -168,9 +184,6 @@ void main() {
 
         //def_index = (index_z - 1) * gl_NumWorkGroups.x * gl_NumWorkGroups.y+ (index_x - 1) * gl_NumWorkGroups.y+ index_y;
 
-
-
-
         for (int n = 0; triTable[bin_int][n] != -1; n += 3) {
             allTriangles[def_index].p[n] = edgeVertices[triTable[bin_int][n]];
             allTriangles[def_index].p[n + 1] = edgeVertices[triTable[bin_int][n + 1]];
@@ -182,14 +195,13 @@ void main() {
             vec3 b = vec3(allTriangles[def_index].p[n + 1].x, allTriangles[def_index].p[n + 1].y, allTriangles[def_index].p[n + 1].z);
             vec3 c = vec3(allTriangles[def_index].p[n + 2].x, allTriangles[def_index].p[n + 2].y, allTriangles[def_index].p[n + 2].z);
 
-
-            vec3 normal = -normalize(cross(b-a,c-a));
-
-            allNormals[def_index].p[n] = vec4(normal, 0.0f);
-            allNormals[def_index].p[n + 1] = vec4(normal, 0.0f);
-            allNormals[def_index].p[n + 2] = vec4(normal, 0.0f);
+            //vec3 normal = -normalize(cross(b-a,c-a));
 
 
+
+            allNormals[def_index].p[n] = vec4(getNormal(a), 0.0f);
+            allNormals[def_index].p[n + 1] = vec4(getNormal(b), 0.0f);
+            allNormals[def_index].p[n + 2] = vec4(getNormal(c), 0.0f);
         }
 
 

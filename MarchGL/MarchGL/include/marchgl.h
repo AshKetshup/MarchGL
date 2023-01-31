@@ -18,6 +18,7 @@
 #include <filesystem>
 #include <iostream>
 
+#include "cubemap.h"
 #include "cubeMarch.h"
 
 using namespace std;
@@ -112,6 +113,7 @@ class MarchGL {
 	unsigned threadAmount;
 
 	cubeMarch* marchingCubes;
+	Cubemap* cubemap;
 
 	Arguments args;
 	SHADER_SETTINGS sS;
@@ -127,8 +129,6 @@ class MarchGL {
 	ImVec4 lightColor = ImVec4(1.f, 1.f, 1.f, 1.f);
 	bool cameraLightSnap = false;
 	vec3 lightPos = vec3(0.f);
-
-
 
 	// Timing 
 	float deltaTime = 0.0f;

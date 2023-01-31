@@ -72,6 +72,9 @@
     <ClCompile Include="include\cparse\builtin-features.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\cubemap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\shader_vs.glsl" />
@@ -91,6 +94,8 @@
     <None Include="res\shaders\computeShader.cs">
       <Filter>shaders</Filter>
     </None>
+    <None Include="res\shaders\skybox_fs.glsl" />
+    <None Include="res\shaders\skybox_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\filesys.hpp">
@@ -199,6 +204,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\shader_c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cubemap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

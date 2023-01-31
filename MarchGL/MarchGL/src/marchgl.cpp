@@ -214,6 +214,10 @@ MarchGL::MarchGL(Arguments args) {
 		sS.colorMesh = vec4(this->SURF_DEFAULT_COLOR, 1.f);
 		sS.gridOn = true;
 		sS.meshOn = true;
+		sS.skyboxOn = true;
+
+		sS.refractVal = 0.5;
+		sS.ratioRefractReflect = 0.5;
 
 		rS.gridSize = vec3(1.f);
 		rS.cubeSize = 0.05f;
@@ -258,7 +262,7 @@ MarchGL::MarchGL(Arguments args) {
 		cout << "Done.\n" << endl;
 
 		marchingCubes = new cubeMarch();
-
+		cubemap = new Cubemap();
 	} catch (const MarchGLException& e) {
 		cerr << "[Error]: " << e.what() << endl;
 		cout << "Abort Launch!" << endl;
@@ -356,9 +360,11 @@ void MarchGL::renderUI(void) {
 
 		ImGui::Spacing();
 
+		float maxVal = glm::max(glm::max(rS.gridSize.x, rS.gridSize.y), rS.gridSize.z);
+
 		ImGui::BeginGroup();
 		ImGui::Text("Light Position");
-		ImGui::SliderFloat3(" ", &sS.lightPos.x, -10.f, 10.f);
+		ImGui::SliderFloat3(" ", &sS.lightPos.x, -maxVal, maxVal);
 		ImGui::Checkbox("Snap light to camera", &sS.cameraLightSnap);
 		ImGui::EndGroup();
 
@@ -368,6 +374,20 @@ void MarchGL::renderUI(void) {
 		ImGui::Checkbox("Show Mesh", &sS.meshOn);
 		ImGui::SameLine();
 		ImGui::Checkbox("Show Grid", &sS.gridOn);
+		ImGui::SameLine();
+		ImGui::Checkbox("Show Skybox", &sS.skyboxOn);
+		ImGui::EndGroup();
+
+		ImGui::Spacing();
+
+		ImGui::BeginGroup();
+		ImGui::Checkbox("Reflect", &sS.isReflect);
+		ImGui::SameLine();
+		ImGui::Checkbox("Refract", &sS.isRefract);
+
+		ImGui::DragFloat("Refract Value", &sS.refractVal);
+
+		ImGui::SliderFloat("Ratio", &sS.ratioRefractReflect, 0.f, 1.f);
 		ImGui::EndGroup();
 
 		ImGui::End();
@@ -445,11 +465,15 @@ void MarchGL::refresh(void) {
 	sS.lightPos = lightPos;
 	sS.colorLight = vec4(lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	sS.colorMesh = vec4(meshColor.x, meshColor.y, meshColor.z, meshColor.w);*/
+	if (sS.skyboxOn)
+		cubemap->draw(camera);
+
 	if (sS.gridOn)
 		marchingCubes->drawGrid(camera);
 
-	if (sS.meshOn)
+	if (sS.meshOn) {
 		marchingCubes->drawMesh(camera, vec3(0.0f), sS);
+	}
 }
 
 void MarchGL::terminate(void) {
