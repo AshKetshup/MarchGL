@@ -19,6 +19,8 @@ typedef struct {
 	glm::vec4 colorLight;
 	bool cameraLightSnap;
 	glm::vec3 lightPos;
+	bool gridOn;
+	bool meshOn;
 } SHADER_SETTINGS;
 
 typedef struct {
@@ -42,6 +44,7 @@ class cubeMarch {
 	Shader basicShader;								// Grid shader
 	Shader shader;									// Mesh shader
 	std::vector<glm::vec3> meshTriangles, normals;	// vertices for the triangles (mesh)
+	std::vector<glm::vec3> gridPoints;
 	unsigned VAO, meshVAO, gridVAO, gridLinesVAO;
 	RENDER_SETTINGS renderSettings;
 	string iFunction;
@@ -78,8 +81,8 @@ class cubeMarch {
 	void drawMesh(Camera camera, glm::vec3 trans, SHADER_SETTINGS& settings);
 
 	//---- Grid ----
-	// void createGrid();
-	// void drawGrid(Camera camera);
+	void createGrid();
+	void drawGrid(Camera camera);
 };
 
 #endif

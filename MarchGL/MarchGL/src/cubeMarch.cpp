@@ -33,6 +33,14 @@ cubeMarch::cubeMarch(void) {
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
 
+	std::cout << "LOADING Grid SHADER: ... " << std::endl << std::endl;
+	basicShader = Shader("res/shaders/basicColorShader_vs.glsl", "res/shaders/basicColorShader_fs.glsl");
+	if (!basicShader.wasSuccessful()) {
+		std::cout << "Shader was not successful" << std::endl;
+		std::cout << basicShader.getReport() << std::endl;
+		return;
+	} else
+		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
 
 	std::cout << "LOADING CubeMarch COMPUTE SHADER: ... " << std::endl << std::endl;
 	computeShader = ComputeShader("res/shaders/computeShaderOriginal.cs");
@@ -43,6 +51,7 @@ cubeMarch::cubeMarch(void) {
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl;
 
+	createGrid();
 }
 
 cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
@@ -55,10 +64,18 @@ cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
 
 	std::cout << "LOADING CubeMarch SHADER: ... " << std::endl << std::endl;
 	shader = Shader("res/shaders/basicShader_vs.glsl", "res/shaders/basicShader_fs.glsl");
-	basicShader = Shader("res/shaders/basicColorShader_vs.glsl", "res/shaders/basicColorShader_fs.glsl");
 	if (!shader.wasSuccessful()) {
 		std::cout << "Shader was not successful" << std::endl;
 		std::cout << shader.getReport() << std::endl;
+		return;
+	} else
+		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
+
+	std::cout << "LOADING Grid SHADER: ... " << std::endl << std::endl;
+	basicShader = Shader("res/shaders/basicColorShader_vs.glsl", "res/shaders/basicColorShader_fs.glsl");
+	if (!basicShader.wasSuccessful()) {
+		std::cout << "Shader was not successful" << std::endl;
+		std::cout << basicShader.getReport() << std::endl;
 		return;
 	} else
 		std::cout << std::endl << "[DONE]" << std::endl << std::endl;
@@ -88,6 +105,7 @@ cubeMarch::cubeMarch(RENDER_SETTINGS& rS) {
 	cout << "Render Mode: " << renderSettings.renderMode << endl;
 	cout << "Thread Amount: " << renderSettings.threadAmount << endl;
 
+	createGrid();
 }
 
 void cubeMarch::generateSingle(glm::vec3 currPoint) {
@@ -302,8 +320,6 @@ void cubeMarch::generate(void) {
 		generateGPU();
 	}
 	std::cout << std::endl << "[DONE]" << std::endl << std::endl;
-
-
 }
 
 //------------------------------------------------------------------------------------------------
@@ -315,70 +331,67 @@ void cubeMarch::setIFunction(IMPLICIT_FUNCTION& iF) {
 
 #pragma region Grid
 //----grid----
-//void cubeMarch::createGrid() {
-//	std::cout << "Create Grid: ... " << std::endl;
-//	std::cout << "|";
-//
-//	VOXEL tmp;
-//
-//	for (float x = -box_lim[0]; x < box_lim[0]; x += gridDist) {
-//		int tX = ( ( x + box_lim[0] ) / ( box_lim[0] * 2 ) ) * 100 / gridDist;
-//		if (tX % 10 == 0)
-//			std::cout << "#";
-//		for (float y = -box_lim[1]; y < box_lim[1]; y += gridDist)
-//			for (float z = -box_lim[2]; z < box_lim[2]; z += gridDist) {
-//				//for marching cubes 
-//
-//				tmp.p[0] = glm::vec3(x, y, z);
-//				tmp.p[1] = glm::vec3(x + gridDist, y, z);
-//				tmp.p[2] = glm::vec3(x + gridDist, y + gridDist, z);
-//				tmp.p[3] = glm::vec3(x, y + gridDist, z);
-//				tmp.p[4] = glm::vec3(x, y, z + gridDist);
-//				tmp.p[5] = glm::vec3(x + gridDist, y, z + gridDist);
-//				tmp.p[6] = glm::vec3(x + gridDist, y + gridDist, z + gridDist);
-//				tmp.p[7] = glm::vec3(x, y + gridDist, z + gridDist);
-//
-//				voxels.push_back(tmp);
-//			}
-//	}
-//	std::cout << std::endl;
-//
-//	gridPoints = cmgrid.size() / 6;
-//	unsigned VBO;
-//	glGenVertexArrays(1, &gridVAO);
-//	glGenBuffers(1, &VBO);
-//
-//	glBindVertexArray(gridVAO);
-//	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//	glBufferData(GL_ARRAY_BUFFER, cmgrid.size() * sizeof(float), &cmgrid[0], GL_STATIC_DRAW);
-//
-//	glEnableVertexAttribArray(0);
-//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
-//	glEnableVertexAttribArray(1);
-//
-//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) ( 3 * sizeof(float) ));
-//
-//	std::cout << "[DONE]" << std::endl;
-//}
+void cubeMarch::createGrid() {
+	std::cout << "Create Grid: ... " << std::endl;
 
-//void cubeMarch::drawGrid(Camera camera) {
-//	glm::mat4 projection;
-//	glm::mat4 view;
-//	glm::mat4 model;
-//
-//	projection = glm::perspective(glm::radians(camera.Zoom), (float) 1920 / (float) 1080, 0.1f, 100.0f);
-//	view = camera.GetViewMatrix();
-//	model = glm::mat4(1.0f);
-//	basicShader.use();
-//	basicShader.setMat4("projection", projection);
-//	basicShader.setMat4("view", view);
-//	basicShader.setMat4("model", model);
-//
-//	glBindVertexArray(gridVAO);
-//	glEnable(GL_PROGRAM_POINT_SIZE);
-//	glPointSize(5.0);
-//	glDrawArrays(GL_POINTS, 0, gridPoints);
-//}
+	gridPoints.clear();
+
+	glm::vec3 divided = renderSettings.gridSize * glm::vec3(2.f) * renderSettings.cubeSize;
+
+	cout << divided.x << " " << divided.y << " " << divided.z << endl;
+
+	for (float x = -renderSettings.gridSize.x; x < renderSettings.gridSize.x + renderSettings.cubeSize; x += renderSettings.cubeSize)
+		for (float y = -renderSettings.gridSize.y; y < renderSettings.gridSize.y + renderSettings.cubeSize; y += renderSettings.cubeSize)
+			for (float z = -renderSettings.gridSize.z; z < renderSettings.gridSize.z + renderSettings.cubeSize; z += renderSettings.cubeSize) {
+				bool testGridLine =
+					( abs(z) - renderSettings.gridSize.z == 0 && abs(y) - renderSettings.gridSize.y == 0 ) ||
+					( abs(z) - renderSettings.gridSize.z == 0 && abs(x) - renderSettings.gridSize.x == 0 ) ||
+					( abs(x) - renderSettings.gridSize.x == 0 && abs(y) - renderSettings.gridSize.y == 0 )
+					;
+
+				if (testGridLine)
+					gridPoints.push_back(glm::vec3(x, y, z));
+			}
+
+	unsigned VBO;
+	glGenVertexArrays(1, &gridVAO);
+	glGenBuffers(1, &VBO);
+
+	glBindVertexArray(gridVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, gridPoints.size() * sizeof(glm::vec3), &gridPoints[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*) 0);
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*) ( sizeof(glm::vec3) ));
+
+	std::cout << "[DONE]" << std::endl;
+}
+
+void cubeMarch::drawGrid(Camera camera) {
+	glm::mat4 projection;
+	glm::mat4 view;
+	glm::mat4 model;
+
+	constexpr float ratio = (float) 1920 / (float) 1080;
+	projection = glm::perspective(glm::radians(camera.Zoom), ratio, 0.1f, 100.0f);
+	view = camera.GetViewMatrix();
+	model = glm::mat4(1.0f);
+	model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+	model = glm::translate(model, glm::vec3(0.f));
+
+	shader.use();
+	shader.setMat4("projection", projection);
+	shader.setMat4("view", view);
+	shader.setMat4("model", model);
+
+	glBindVertexArray(gridVAO);
+	glEnable(GL_PROGRAM_POINT_SIZE);
+	glPointSize(5.0);
+	glDrawArrays(GL_POINTS, 0, gridPoints.size());
+}
 #pragma endregion
 
 //-----marching cubes algorithm-----

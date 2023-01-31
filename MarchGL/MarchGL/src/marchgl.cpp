@@ -212,9 +212,11 @@ MarchGL::MarchGL(Arguments args) {
 
 		sS.colorLight = vec4(1.f);
 		sS.colorMesh = vec4(this->SURF_DEFAULT_COLOR, 1.f);
+		sS.gridOn = true;
+		sS.meshOn = true;
 
 		rS.gridSize = vec3(1.f);
-		rS.cubeSize = 0.1f;
+		rS.cubeSize = 0.05f;
 
 		cout << "\t| Window Resolution: " << scr_width << "x" << scr_height << endl;
 		cout << "\t[OK]\n" << endl;
@@ -340,17 +342,33 @@ void MarchGL::renderUI(void) {
 	{
 		ImGui::Begin("Shader Settings");
 
+		ImGui::BeginGroup();
 		ImGui::Text("Mesh Color");
 		ImGui::ColorEdit3("", &sS.colorMesh.x);
+		ImGui::EndGroup();
 
 		ImGui::Spacing();
 
+		ImGui::BeginGroup();
 		ImGui::Text("Light Color");
-		ImGui::ColorEdit3("", &sS.colorLight.x);
+		ImGui::ColorEdit3(" ", &sS.colorLight.x);
+		ImGui::EndGroup();
 
+		ImGui::Spacing();
+
+		ImGui::BeginGroup();
+		ImGui::Text("Light Position");
+		ImGui::SliderFloat3(" ", &sS.lightPos.x, -10.f, 10.f);
 		ImGui::Checkbox("Snap light to camera", &sS.cameraLightSnap);
+		ImGui::EndGroup();
 
-		ImGui::SliderFloat3("Light Position", &sS.lightPos.x, -10.f, 10.f);
+		ImGui::Spacing();
+
+		ImGui::BeginGroup();
+		ImGui::Checkbox("Show Mesh", &sS.meshOn);
+		ImGui::SameLine();
+		ImGui::Checkbox("Show Grid", &sS.gridOn);
+		ImGui::EndGroup();
 
 		ImGui::End();
 	}
@@ -427,8 +445,11 @@ void MarchGL::refresh(void) {
 	sS.lightPos = lightPos;
 	sS.colorLight = vec4(lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	sS.colorMesh = vec4(meshColor.x, meshColor.y, meshColor.z, meshColor.w);*/
+	if (sS.gridOn)
+		marchingCubes->drawGrid(camera);
 
-	marchingCubes->drawMesh(camera, vec3(0.0f), sS);
+	if (sS.meshOn)
+		marchingCubes->drawMesh(camera, vec3(0.0f), sS);
 }
 
 void MarchGL::terminate(void) {
