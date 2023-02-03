@@ -216,11 +216,11 @@ MarchGL::MarchGL(Arguments args) {
 		sS.meshOn = true;
 		sS.skyboxOn = true;
 
-		sS.refractVal = 0.5;
-		sS.ratioRefractReflect = 0.5;
+		sS.refractVal = 0.75;
+		sS.ratioRefractReflect = 0.3;
 
 		rS.gridSize = vec3(1.f);
-		rS.cubeSize = 0.05f;
+		rS.cubeSize = 0.1f;
 
 		cout << "\t| Window Resolution: " << scr_width << "x" << scr_height << endl;
 		cout << "\t[OK]\n" << endl;
@@ -311,25 +311,28 @@ action MarchGL::processInput(void) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	camera.MovementSpeed = ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS )
-		? 6.f
-		: 3.f;
+	if (!guiMode) {
+		camera.MovementSpeed = ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS )
+			? 6.f
+			: 3.f;
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.ProcessKeyboard(DOWN, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		camera.ProcessKeyboard(UP, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			camera.ProcessKeyboard(FORWARD, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			camera.ProcessKeyboard(LEFT, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			camera.ProcessKeyboard(BACKWARD, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			camera.ProcessKeyboard(RIGHT, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			camera.ProcessKeyboard(DOWN, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+			camera.ProcessKeyboard(UP, deltaTime);
 
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-		return action::CAMERA_RESET;
+		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+			return action::CAMERA_RESET;
+
+	}
 
 	glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
