@@ -7,18 +7,33 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MarchGL", "MarchGL\MarchGL.
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release All Platforms|ARM = Release All Platforms|ARM
+		Release All Platforms|x64 = Release All Platforms|x64
+		Release All Platforms|x86 = Release All Platforms|x86
+		Release|ARM = Release|ARM
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Debug|ARM.ActiveCfg = Debug|ARM
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Debug|ARM.Build.0 = Debug|ARM
 		{A7B998F8-8331-4269-B318-1D7E813A2199}.Debug|x64.ActiveCfg = Debug|x64
 		{A7B998F8-8331-4269-B318-1D7E813A2199}.Debug|x64.Build.0 = Debug|x64
 		{A7B998F8-8331-4269-B318-1D7E813A2199}.Debug|x86.ActiveCfg = Debug|Win32
 		{A7B998F8-8331-4269-B318-1D7E813A2199}.Debug|x86.Build.0 = Debug|Win32
-		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release|x64.ActiveCfg = Release|x64
-		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release|x64.Build.0 = Release|x64
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release All Platforms|ARM.ActiveCfg = Release All Platforms|x64
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release All Platforms|ARM.Build.0 = Release All Platforms|x64
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release All Platforms|x64.ActiveCfg = Release All Platforms|x64
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release All Platforms|x64.Build.0 = Release All Platforms|x64
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release All Platforms|x86.ActiveCfg = Release All Platforms|Win32
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release All Platforms|x86.Build.0 = Release All Platforms|Win32
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release|ARM.ActiveCfg = Release|ARM
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release|ARM.Build.0 = Release|ARM
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release|x64.ActiveCfg = Debug|x64
+		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release|x64.Build.0 = Debug|x64
 		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release|x86.ActiveCfg = Release|Win32
 		{A7B998F8-8331-4269-B318-1D7E813A2199}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
