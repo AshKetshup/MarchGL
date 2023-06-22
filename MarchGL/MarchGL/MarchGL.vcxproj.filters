@@ -75,6 +75,9 @@
     <ClCompile Include="src\cubemap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\cutScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\shader_vs.glsl" />
@@ -96,6 +99,8 @@
     </None>
     <None Include="res\shaders\skybox_fs.glsl" />
     <None Include="res\shaders\skybox_vs.glsl" />
+    <None Include="res\shaders\cutscene_fs.glsl" />
+    <None Include="res\shaders\cutscene_vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\filesys.hpp">
@@ -212,6 +217,9 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\cutScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MarchGL.rc">
@@ -223,6 +231,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\icon2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\LICENCIATURA\Projeto\CalcGL\bin\res\cgl2.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

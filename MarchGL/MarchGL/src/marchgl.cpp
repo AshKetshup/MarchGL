@@ -263,6 +263,9 @@ MarchGL::MarchGL(Arguments args) {
 
 		marchingCubes = new cubeMarch();
 		cubemap = new Cubemap();
+		cout << ( "res" + slash + "textures" + slash + "cgl2.bmp" ).c_str() << endl;
+		cutscene = new cutScene(( "res" + slash + "textures" + slash + "cgl2.bmp" ).c_str());
+
 	} catch (const MarchGLException& e) {
 		cerr << "[Error]: " << e.what() << endl;
 		cout << "Abort Launch!" << endl;
@@ -271,6 +274,11 @@ MarchGL::MarchGL(Arguments args) {
 	}
 
 	success = true;
+}
+
+void MarchGL::renderCutScene(void) {
+	//std::cout << "CUTSCENE" << std::endl;
+	cutscene->drawMesh(currentFrame, scr_width, scr_height);
 }
 
 void MarchGL::main(void) {
@@ -296,11 +304,17 @@ void MarchGL::main(void) {
 			prevTime = crntTime;
 			counter = 0;
 		}
-
 		refresh();
 
-		//s.drawMesh(camera, vec3(0), sS);
 		renderUI();
+
+		if (crntTime < 5.0f) {
+			renderCutScene();
+		} else if (cutSceneOn) {
+			cutSceneOn = false;
+
+			cutscene->~cutScene();
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -331,7 +345,6 @@ action MarchGL::processInput(void) {
 
 		if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 			return action::CAMERA_RESET;
-
 	}
 
 	glfwSetInputMode(window, GLFW_CURSOR, guiMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
@@ -449,6 +462,8 @@ void MarchGL::refresh(void) {
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 
+	cout << glfwGetTime() << endl;
+
 	switch (processInput()) {
 		case action::CAMERA_RESET:
 			camera.Position = vec3(0.f, 1.f, 0.f);
@@ -464,19 +479,14 @@ void MarchGL::refresh(void) {
 			break;
 	}
 
-	/*sS.cameraLightSnap = cameraLightSnap;
-	sS.lightPos = lightPos;
-	sS.colorLight = vec4(lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	sS.colorMesh = vec4(meshColor.x, meshColor.y, meshColor.z, meshColor.w);*/
 	if (sS.skyboxOn)
 		cubemap->draw(camera);
 
 	if (sS.gridOn)
 		marchingCubes->drawGrid(camera);
 
-	if (sS.meshOn) {
+	if (sS.meshOn)
 		marchingCubes->drawMesh(camera, vec3(0.0f), sS);
-	}
 }
 
 void MarchGL::terminate(void) {

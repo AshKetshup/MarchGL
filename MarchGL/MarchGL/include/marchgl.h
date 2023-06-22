@@ -20,6 +20,7 @@
 
 #include "cubemap.h"
 #include "cubeMarch.h"
+#include "cutScene.h"
 
 using namespace std;
 using namespace glm;
@@ -104,6 +105,7 @@ class MarchGL {
 	string fontDir;
 	string resDir;
 
+
 	//string slash; //???????????????????????????????????????????????????
 
 	string fontName;
@@ -114,6 +116,7 @@ class MarchGL {
 
 	cubeMarch* marchingCubes;
 	Cubemap* cubemap;
+	cutScene* cutscene;
 
 	Arguments args;
 	SHADER_SETTINGS sS;
@@ -139,6 +142,7 @@ class MarchGL {
 	mouse_data mouse;
 	bool guiMode = false;
 	bool w_was_pressed = false;
+	bool cutSceneOn = true;
 
 	vec3 surfColor = SURF_DEFAULT_COLOR;
 	vec3 bgColor = BG_DEFAULT_COLOR;
@@ -147,6 +151,8 @@ class MarchGL {
 	int initializeGLAD(void);
 	void initializeImGUI(void);
 	action processInput(void);
+
+	void renderCutScene(void);
 
 	void newFrameUI(void);
 	void renderUI(void);
