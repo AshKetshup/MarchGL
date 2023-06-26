@@ -101,6 +101,8 @@
     <None Include="res\shaders\skybox_vs.glsl" />
     <None Include="res\shaders\cutscene_fs.glsl" />
     <None Include="res\shaders\cutscene_vs.glsl" />
+    <None Include="res\shaders\cutsceneBG_vs.glsl" />
+    <None Include="res\shaders\cutsceneBG_fs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\filesys.hpp">

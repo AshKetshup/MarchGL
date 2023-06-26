@@ -263,8 +263,8 @@ MarchGL::MarchGL(Arguments args) {
 
 		marchingCubes = new cubeMarch();
 		cubemap = new Cubemap();
-		cout << ( "res" + slash + "textures" + slash + "cgl2.bmp" ).c_str() << endl;
-		cutscene = new cutScene(( "res" + slash + "textures" + slash + "cgl2.bmp" ).c_str());
+		cout << ( "res" + slash + "textures" + slash + "mgl_logo.bmp" ).c_str() << endl;
+		cutscene = new cutScene(( "res" + slash + "textures" + slash + "mgl_logo.bmp" ).c_str());
 
 	} catch (const MarchGLException& e) {
 		cerr << "[Error]: " << e.what() << endl;
@@ -308,7 +308,7 @@ void MarchGL::main(void) {
 
 		renderUI();
 
-		if (crntTime < 5.0f) {
+		if (crntTime < 6.0f) {
 			renderCutScene();
 		} else if (cutSceneOn) {
 			cutSceneOn = false;

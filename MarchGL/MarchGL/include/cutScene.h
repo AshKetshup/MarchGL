@@ -26,11 +26,12 @@ typedef struct {
 
 class cutScene {
 	private:
-	Shader shader;
+	Shader shader, shaderBG;
 	int width, height = 0;
 
 	ImgData data;
 	unsigned VAO, VBO, EBO, texture;
+	unsigned VAOs, VBOs, EBOs;
 
 	public:
 	cutScene(void);

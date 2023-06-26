@@ -393,6 +393,8 @@
   <ItemGroup>
     <None Include="res\shaders\computeShader.cs" />
     <None Include="res\shaders\computeShaderOriginal.cs" />
+    <None Include="res\shaders\cutsceneBG_fs.glsl" />
+    <None Include="res\shaders\cutsceneBG_vs.glsl" />
     <None Include="res\shaders\cutscene_fs.glsl" />
     <None Include="res\shaders\cutscene_vs.glsl" />
     <None Include="res\shaders\marchingcubes_cs.glsl" />

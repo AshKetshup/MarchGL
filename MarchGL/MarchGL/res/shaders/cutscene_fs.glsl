@@ -8,6 +8,7 @@ uniform float iTime;
 
 uniform sampler2D ourTexture;
 
+
 void main() {
-    gl_FragColor = vec4(texture(ourTexture, TexCoord).xyz, smoothstep(4.0, 0.0, iTime-2.0));
+    gl_FragColor = vec4(texture(ourTexture, TexCoord).xyz, smoothstep(3.0, 0.0, iTime-2.0));
 }
