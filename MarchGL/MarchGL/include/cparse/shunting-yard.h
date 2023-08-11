@@ -39,6 +39,7 @@ namespace cparse {
 		REAL = 0x21,  // == 0x20 + 0x1 => Real numbers.
 		INTEIRO = 0x22,   // == 0x20 + 0x2 => Integral numbers.
 		BOOLEANO = 0x23,  // == 0x20 + 0x3 => Boolean Type.
+		BOOL = 0x23,  // == 0x20 + 0x3 => Boolean Type.
 
 		// Complex types:
 		IT = 0x40,      // Everything with the bit 0x40 set are iterators.

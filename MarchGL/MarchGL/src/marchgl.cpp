@@ -2,6 +2,11 @@
 
 #include "mutils.h"
 
+#ifdef __linux__
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
 namespace callback {
 	MarchGL* instance = nullptr;
 
@@ -227,7 +232,12 @@ MarchGL::MarchGL(Arguments args) {
 
 
 		cout << "\tSetting Relevant Directories: " << endl;
+#ifdef __linux
+		#warning current_path() may not provide the actual app path! Consider using it in conjunction with argv[0] or similar.
+		fs::path appPath(fs::current_path());
+#else
 		filesystem::path appPath(filesys::getAppPath());
+#endif
 
 		appDir = appPath.parent_path().string();
 		cout << "\t| App Dir: " << appDir << endl;
