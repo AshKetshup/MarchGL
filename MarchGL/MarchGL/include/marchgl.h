@@ -1,7 +1,9 @@
 #ifndef MARCHGL_H
 #define MARCHGL_H
 
+#ifndef __linux__
 #include <windows.h>
+#endif
 
 #include <ImGUI/imgui.h>
 #include <ImGUI/imgui_stdlib.h>
@@ -11,7 +13,9 @@
 #include <camera.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#ifndef __linux__
 #include <filesys.hpp>
+#endif
 
 #include <GL/gl.h>
 
@@ -133,7 +137,7 @@ class MarchGL {
 	bool cameraLightSnap = false;
 	vec3 lightPos = vec3(0.f);
 
-	// Timing 
+	// Timing
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 	float currentFrame;
