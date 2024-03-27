@@ -381,6 +381,7 @@
     <ClCompile Include="include\ImGUI\imgui_stdlib.cpp" />
     <ClCompile Include="include\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="include\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="src\cutScene.cpp" />
     <ClCompile Include="src\marchgl.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp">
@@ -392,6 +393,10 @@
   <ItemGroup>
     <None Include="res\shaders\computeShader.cs" />
     <None Include="res\shaders\computeShaderOriginal.cs" />
+    <None Include="res\shaders\cutsceneBG_fs.glsl" />
+    <None Include="res\shaders\cutsceneBG_vs.glsl" />
+    <None Include="res\shaders\cutscene_fs.glsl" />
+    <None Include="res\shaders\cutscene_vs.glsl" />
     <None Include="res\shaders\marchingcubes_cs.glsl" />
     <None Include="res\shaders\shader_fs.glsl" />
     <None Include="res\shaders\shader_vs.glsl" />
@@ -417,9 +422,11 @@
     <ClInclude Include="include\cparse\shunting-yard.h" />
     <ClInclude Include="include\cubemap.h" />
     <ClInclude Include="include\cubeMarch.h" />
+    <ClInclude Include="include\cutScene.h" />
     <ClInclude Include="include\filesys.hpp" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\glm\glm.hpp" />
+    <ClInclude Include="include\marchShader.h" />
     <ClInclude Include="include\ImGUI\imconfig.h" />
     <ClInclude Include="include\ImGUI\imgui.h" />
     <ClInclude Include="include\ImGUI\imgui_impl_glfw.h" />
@@ -434,7 +441,6 @@
     <ClInclude Include="include\main.h" />
     <ClInclude Include="include\marchgl.h" />
     <ClInclude Include="include\marchingUtils.h" />
-    <ClInclude Include="include\shader_c.h" />
     <ClInclude Include="include\shader_m.h" />
     <ClInclude Include="include\squareMarch.h" />
     <ClInclude Include="include\stb_image.h" />
@@ -446,6 +452,7 @@
     <ResourceCompile Include="MarchGL.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\..\..\..\LICENCIATURA\Projeto\CalcGL\bin\res\cgl2.bmp" />
     <Image Include="res\BrownMarchy.ico" />
     <Image Include="res\icon2.ico" />
   </ItemGroup>

@@ -15,11 +15,11 @@ class Cubemap {
 
 	std::vector<std::string> faces{
 		"res/skybox/posx.jpg",
-		"res/skybox/negx.jpg",
-		"res/skybox/posy.jpg",
-		"res/skybox/negy.jpg",
-		"res/skybox/posz.jpg",
-		"res/skybox/negz.jpg"
+			"res/skybox/negx.jpg",
+			"res/skybox/posy.jpg",
+			"res/skybox/negy.jpg",
+			"res/skybox/posz.jpg",
+			"res/skybox/negz.jpg"
 	};
 
 	float skyboxVertices[108]{

@@ -4,6 +4,7 @@
 #include <stb_image.h>
 
 
+
 Cubemap::Cubemap() {
 	this->texID = loadCubemap();
 

@@ -1,7 +1,9 @@
 #ifndef MARCHGL_H
 #define MARCHGL_H
 
+#ifndef __linux__
 #include <windows.h>
+#endif
 
 #include <ImGUI/imgui.h>
 #include <ImGUI/imgui_stdlib.h>
@@ -11,7 +13,9 @@
 #include <camera.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#ifndef __linux__
 #include <filesys.hpp>
+#endif
 
 #include <GL/gl.h>
 
@@ -20,6 +24,7 @@
 
 #include "cubemap.h"
 #include "cubeMarch.h"
+#include "cutScene.h"
 
 using namespace std;
 using namespace glm;
@@ -104,6 +109,7 @@ class MarchGL {
 	string fontDir;
 	string resDir;
 
+
 	//string slash; //???????????????????????????????????????????????????
 
 	string fontName;
@@ -114,6 +120,7 @@ class MarchGL {
 
 	cubeMarch* marchingCubes;
 	Cubemap* cubemap;
+	cutScene* cutscene;
 
 	Arguments args;
 	SHADER_SETTINGS sS;
@@ -130,7 +137,7 @@ class MarchGL {
 	bool cameraLightSnap = false;
 	vec3 lightPos = vec3(0.f);
 
-	// Timing 
+	// Timing
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 	float currentFrame;
@@ -139,6 +146,7 @@ class MarchGL {
 	mouse_data mouse;
 	bool guiMode = false;
 	bool w_was_pressed = false;
+	bool cutSceneOn = true;
 
 	vec3 surfColor = SURF_DEFAULT_COLOR;
 	vec3 bgColor = BG_DEFAULT_COLOR;
@@ -147,6 +155,8 @@ class MarchGL {
 	int initializeGLAD(void);
 	void initializeImGUI(void);
 	action processInput(void);
+
+	void renderCutScene(void);
 
 	void newFrameUI(void);
 	void renderUI(void);

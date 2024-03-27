@@ -2,9 +2,10 @@
 #define CUBEMARCH_H
 
 #include <computeshader.h>
+#include <shader_m.h>
 #include <camera.h>
 
-#include "marchingutils.h"
+#include "marchingUtils.h"
 using namespace std;
 
 

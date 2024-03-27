@@ -2,9 +2,8 @@
 
 int argHandler(int argc, const char* argv[], Arguments& args) {
 
-	if (argc == 2 && ( strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0 )) {
+	if (argc == 2 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0 )) {
 		cout << HELP;
-
 		return -1;
 	}
 
@@ -13,7 +12,7 @@ int argHandler(int argc, const char* argv[], Arguments& args) {
 	args.threads = ( THREAD_AMNT <= 0 ) ? 1 : THREAD_AMNT;
 	args.rMode = RMODE;
 
-	if (( argc - 1 ) % 2 == 0) {
+	if ((( argc - 1 ) % 2 == 0) && (argc != 1)) {
 		unsigned int amount = ( argc - 1 ) / 2;
 		for (size_t i = 0; i < amount; i++) {
 			const char* tag = argv[1 + ( i * 2 )];
@@ -38,6 +37,8 @@ int argHandler(int argc, const char* argv[], Arguments& args) {
 			}
 		}
 	}
+
+	return 0;
 }
 
 int main(int argc, const char* argv[]) {
